@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     glow?: boolean;
     hover3D?: boolean;
+    children?: React.ReactNode;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -32,6 +33,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
             setIsHovered(false);
         };
 
+        // Extract conflicting drag props
+        const { onDrag, onDragStart, onDragEnd, ...safeProps } = props as Record<string, unknown>;
+
         return (
             <motion.div
                 ref={ref}
@@ -50,7 +54,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
                 onMouseLeave={handleMouseLeave}
                 whileHover={!hover3D ? { y: -5, scale: 1.02 } : undefined}
                 transition={{ duration: 0.3 }}
-                {...props}
+                {...safeProps}
             >
                 {/* Shine effect on hover */}
                 {isHovered && (
