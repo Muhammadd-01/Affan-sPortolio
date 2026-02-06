@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -37,8 +37,10 @@ const buttonVariants = cva(
     }
 );
 
+type MotionButtonProps = HTMLMotionProps<"button">;
+
 export interface ButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    extends Omit<MotionButtonProps, "onDrag" | "onDragStart" | "onDragEnd">,
     VariantProps<typeof buttonVariants> {
     magnetic?: boolean;
 }
