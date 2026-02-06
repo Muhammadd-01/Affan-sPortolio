@@ -87,8 +87,10 @@ export default function ParticleBackground({ variant = "default" }: ParticleBack
                     straight: false,
                     attract: {
                         enable: true,
-                        rotateX: 600,
-                        rotateY: 1200,
+                        rotate: {
+                            x: 600,
+                            y: 1200,
+                        },
                     },
                 },
                 number: {
