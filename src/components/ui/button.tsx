@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, HTMLMotionProps } from "framer-motion";
+import { motion } from "framer-motion";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -37,12 +37,11 @@ const buttonVariants = cva(
     }
 );
 
-type MotionButtonProps = HTMLMotionProps<"button">;
-
 export interface ButtonProps
-    extends Omit<MotionButtonProps, "onDrag" | "onDragStart" | "onDragEnd">,
+    extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
     magnetic?: boolean;
+    children?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -63,6 +62,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             setIsHovered(false);
         };
 
+        // Extract only safe props to pass to motion.button
+        const { onDrag, onDragStart, onDragEnd, ...safeProps } = props as Record<string, unknown>;
+
         return (
             <motion.button
                 className={cn(buttonVariants({ variant, size, className }))}
@@ -77,7 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 whileHover={{ scale: magnetic ? 1 : 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                {...props}
+                {...safeProps}
             >
                 {/* Hover gradient overlay */}
                 <motion.div
