@@ -315,21 +315,23 @@ export default function HeroSection() {
                     </motion.button>
                 </motion.div>
 
-                {/* Scroll Indicator */}
+                {/* Scroll Indicator - Below buttons, clickable */}
                 <motion.div
+                    variants={itemVariants}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 3, duration: 1 }}
-                    className="absolute bottom-10 left-1/2 -translate-x-1/2"
+                    transition={{ delay: 2.5, duration: 1 }}
+                    className="mt-16 cursor-pointer"
+                    onClick={() => scrollTo("#about")}
                 >
                     <motion.div
-                        animate={{ y: [0, 15, 0] }}
+                        animate={{ y: [0, 10, 0] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="flex flex-col items-center gap-2 text-foreground/40"
+                        className="flex flex-col items-center gap-2 text-foreground/50 hover:text-neon-blue transition-colors"
                     >
                         <span className="text-xs uppercase tracking-widest">Explore More</span>
                         <motion.div
-                            className="w-6 h-10 rounded-full border-2 border-foreground/30 flex items-start justify-center p-2"
+                            className="w-6 h-10 rounded-full border-2 border-current flex items-start justify-center p-2"
                         >
                             <motion.div
                                 className="w-1.5 h-1.5 rounded-full bg-neon-blue"

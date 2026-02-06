@@ -216,6 +216,75 @@ export default function AboutSection() {
                                 </p>
                             </div>
                         </motion.div>
+
+                        {/* NexoVate Digital CEO Card */}
+                        <motion.a
+                            href="https://nexovate-digital.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="glass rounded-2xl p-6 relative overflow-hidden group flex items-center gap-6 cursor-pointer"
+                            whileHover={{ y: -5, scale: 1.02 }}
+                        >
+                            <motion.div
+                                className="absolute inset-0 bg-gradient-to-br from-neon-green/10 to-neon-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            />
+
+                            {/* NexoVate Logo - Inline SVG for infinity symbol */}
+                            <div className="relative z-10 flex-shrink-0">
+                                <motion.div
+                                    className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 p-0.5 flex items-center justify-center"
+                                    whileHover={{ rotate: [0, -5, 5, 0] }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <div className="w-full h-full rounded-xl bg-background/90 flex items-center justify-center">
+                                        <svg viewBox="0 0 100 60" className="w-12 h-12 md:w-14 md:h-14">
+                                            <path
+                                                d="M25 30 C25 15, 50 15, 50 30 C50 45, 75 45, 75 30 C75 15, 50 15, 50 30 C50 45, 25 45, 25 30"
+                                                fill="none"
+                                                stroke="url(#nexoGrad)"
+                                                strokeWidth="8"
+                                                strokeLinecap="round"
+                                            />
+                                            <defs>
+                                                <linearGradient id="nexoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="#3B82F6" />
+                                                    <stop offset="50%" stopColor="#06B6D4" />
+                                                    <stop offset="100%" stopColor="#22D3EE" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                </motion.div>
+                            </div>
+
+                            <div className="relative z-10 flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Rocket className="w-4 h-4 text-neon-green" />
+                                    <span className="text-neon-green text-xs uppercase tracking-wider font-medium">Founder & CEO</span>
+                                </div>
+                                <h3 className="text-xl font-heading font-semibold group-hover:text-neon-blue transition-colors">
+                                    NexoVate Digital
+                                </h3>
+                                <p className="text-foreground/60 text-sm mt-1">
+                                    Leading a digital agency crafting innovative web & mobile solutions
+                                </p>
+                                <div className="flex items-center gap-2 mt-2 text-neon-blue text-sm font-mono">
+                                    <span className="opacity-50">→</span>
+                                    <span className="group-hover:underline">nexovate-digital.vercel.app</span>
+                                </div>
+                            </div>
+
+                            {/* Arrow indicator */}
+                            <motion.div
+                                className="relative z-10 text-neon-blue/50 group-hover:text-neon-blue transition-colors"
+                                animate={{ x: [0, 5, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                            >
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </motion.div>
+                        </motion.a>
                     </motion.div>
 
                     {/* Timeline */}

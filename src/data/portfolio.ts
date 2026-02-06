@@ -13,13 +13,14 @@ import {
     Shield,
 } from "lucide-react";
 
+
 export const personalInfo = {
     name: "Muhammad Affan",
     title: "Full-Stack Developer & Creative Technologist",
     tagline: "Crafting Digital Experiences That Push Boundaries",
-    email: "affan@example.com",
-    phone: "+1234567890",
-    whatsapp: "+1234567890",
+    email: "affan.work05@gmail.com",
+    phone: "+923128538773",
+    whatsapp: "+923128538773",
     location: "Global",
     resumeUrl: "/resume.pdf",
     social: {

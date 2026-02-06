@@ -287,15 +287,29 @@ export default function CustomCursor() {
 }
 
 function ClickRipple({ color }: { color: string }) {
-    const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+    const [explosions, setExplosions] = useState<{ id: number; x: number; y: number; items: { char: string; angle: number; distance: number }[] }[]>([]);
+
+    const codeKeywords = [
+        "const", "let", "function", "return", "async", "await",
+        "import", "export", "class", "=>", "if", "else",
+        "useState", "useEffect", "props", "render", "null"
+    ];
 
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
-            const newRipple = { id: Date.now(), x: e.clientX, y: e.clientY };
-            setRipples(prev => [...prev, newRipple]);
+            // Create explosion items
+            const items = Array(8).fill(0).map((_, i) => ({
+                char: codeKeywords[Math.floor(Math.random() * codeKeywords.length)],
+                angle: (i * 45) + Math.random() * 20,
+                distance: 40 + Math.random() * 40,
+            }));
+
+            const newExplosion = { id: Date.now(), x: e.clientX, y: e.clientY, items };
+            setExplosions(prev => [...prev, newExplosion]);
+
             setTimeout(() => {
-                setRipples(prev => prev.filter(r => r.id !== newRipple.id));
-            }, 600);
+                setExplosions(prev => prev.filter(exp => exp.id !== newExplosion.id));
+            }, 800);
         };
 
         window.addEventListener("click", handleClick);
@@ -304,12 +318,43 @@ function ClickRipple({ color }: { color: string }) {
 
     return (
         <>
-            {ripples.map(ripple => (
-                <div key={ripple.id} className="fixed pointer-events-none z-[9996]"
-                    style={{ left: ripple.x, top: ripple.y }}>
+            {explosions.map(explosion => (
+                <div key={explosion.id} className="fixed pointer-events-none z-[9996]"
+                    style={{ left: explosion.x, top: explosion.y }}>
+                    {/* Code keyword explosion */}
+                    {explosion.items.map((item, i) => {
+                        const rad = (item.angle * Math.PI) / 180;
+                        const endX = Math.cos(rad) * item.distance;
+                        const endY = Math.sin(rad) * item.distance;
+
+                        return (
+                            <motion.div
+                                key={i}
+                                className="absolute font-mono text-xs font-bold whitespace-nowrap"
+                                style={{
+                                    color: color,
+                                    textShadow: `0 0 8px ${color}`,
+                                    left: "50%",
+                                    top: "50%",
+                                }}
+                                initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                                animate={{
+                                    x: endX,
+                                    y: endY,
+                                    opacity: 0,
+                                    scale: 0.5,
+                                }}
+                                transition={{ duration: 0.6, ease: "easeOut" }}
+                            >
+                                {item.char}
+                            </motion.div>
+                        );
+                    })}
+
+                    {/* Ripple rings */}
                     {[0, 1].map((i) => (
                         <motion.div
-                            key={i}
+                            key={`ring-${i}`}
                             className="absolute rounded-full"
                             style={{
                                 border: `1px solid ${color}`,
@@ -319,7 +364,7 @@ function ClickRipple({ color }: { color: string }) {
                                 translateY: "-50%",
                             }}
                             initial={{ width: 0, height: 0, opacity: 0.6 }}
-                            animate={{ width: 60 + i * 20, height: 60 + i * 20, opacity: 0 }}
+                            animate={{ width: 80 + i * 30, height: 80 + i * 30, opacity: 0 }}
                             transition={{ duration: 0.5, delay: i * 0.1 }}
                         />
                     ))}
@@ -328,3 +373,4 @@ function ClickRipple({ color }: { color: string }) {
         </>
     );
 }
+
