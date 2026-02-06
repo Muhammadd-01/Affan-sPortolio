@@ -39,9 +39,9 @@ export default function CustomCursor() {
     const trailXSpring = useSpring(cursorX, trailConfig);
     const trailYSpring = useSpring(cursorY, trailConfig);
 
-    const codeChars = ['<', '>', '/', '{', '}', '(', ')', ';', '0', '1'];
-
     const handleMouseMove = useCallback((e: MouseEvent) => {
+        const codeChars = ['<', '>', '/', '{', '}', '(', ')', ';', '0', '1'];
+
         cursorX.set(e.clientX);
         cursorY.set(e.clientY);
 
@@ -289,13 +289,13 @@ export default function CustomCursor() {
 function ClickRipple({ color }: { color: string }) {
     const [explosions, setExplosions] = useState<{ id: number; x: number; y: number; items: { char: string; angle: number; distance: number }[] }[]>([]);
 
-    const codeKeywords = [
-        "const", "let", "function", "return", "async", "await",
-        "import", "export", "class", "=>", "if", "else",
-        "useState", "useEffect", "props", "render", "null"
-    ];
-
     useEffect(() => {
+        const codeKeywords = [
+            "const", "let", "function", "return", "async", "await",
+            "import", "export", "class", "=>", "if", "else",
+            "useState", "useEffect", "props", "render", "null"
+        ];
+
         const handleClick = (e: MouseEvent) => {
             // Create explosion items
             const items = Array(8).fill(0).map((_, i) => ({

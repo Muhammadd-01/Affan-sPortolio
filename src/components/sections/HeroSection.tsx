@@ -6,19 +6,30 @@ import { personalInfo } from "@/data/portfolio";
 import { useSmoothScroll } from "@/hooks/useNavigation";
 import { useRef, useEffect, useState } from "react";
 
-// Glitch text effect
+// Glitch text effect - with visible name
 function GlitchText({ text, className }: { text: string; className?: string }) {
     return (
         <span className={`relative inline-block ${className}`}>
-            <span className="relative z-10">{text}</span>
             <span
-                className="absolute inset-0 text-neon-blue opacity-70 animate-pulse"
+                className="relative z-10"
+                style={{
+                    background: "linear-gradient(135deg, #00E5FF, #8B5CF6, #00FF9C)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    filter: "drop-shadow(0 0 20px rgba(0, 229, 255, 0.5))",
+                }}
+            >
+                {text}
+            </span>
+            <span
+                className="absolute inset-0 text-neon-blue opacity-50"
                 style={{ transform: "translate(-2px, 2px)", clipPath: "inset(0 0 50% 0)" }}
             >
                 {text}
             </span>
             <span
-                className="absolute inset-0 text-neon-purple opacity-70"
+                className="absolute inset-0 text-neon-purple opacity-50"
                 style={{ transform: "translate(2px, -2px)", clipPath: "inset(50% 0 0 0)" }}
             >
                 {text}

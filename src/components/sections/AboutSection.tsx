@@ -268,9 +268,11 @@ export default function AboutSection() {
                                 <p className="text-foreground/60 text-sm mt-1">
                                     Leading a digital agency crafting innovative web & mobile solutions
                                 </p>
-                                <div className="flex items-center gap-2 mt-2 text-neon-blue text-sm font-mono">
-                                    <span className="opacity-50">→</span>
-                                    <span className="group-hover:underline">nexovate-digital.vercel.app</span>
+                                <div className="flex items-center gap-2 mt-3 text-neon-blue/70 group-hover:text-neon-blue text-xs font-medium transition-colors">
+                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">Visit Website</span>
+                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
                                 </div>
                             </div>
 

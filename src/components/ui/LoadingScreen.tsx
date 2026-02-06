@@ -118,17 +118,17 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
     const [loadingText, setLoadingText] = useState("Initializing");
     const [showContent, setShowContent] = useState(true);
 
-    const loadingStages = [
-        { progress: 15, text: "Loading assets..." },
-        { progress: 30, text: "Compiling components..." },
-        { progress: 45, text: "Initializing Three.js..." },
-        { progress: 60, text: "Setting up animations..." },
-        { progress: 75, text: "Loading portfolio data..." },
-        { progress: 90, text: "Almost ready..." },
-        { progress: 100, text: "Welcome!" },
-    ];
-
     useEffect(() => {
+        const loadingStages = [
+            { progress: 15, text: "Loading assets..." },
+            { progress: 30, text: "Compiling components..." },
+            { progress: 45, text: "Initializing Three.js..." },
+            { progress: 60, text: "Setting up animations..." },
+            { progress: 75, text: "Loading portfolio data..." },
+            { progress: 90, text: "Almost ready..." },
+            { progress: 100, text: "Welcome!" },
+        ];
+
         let currentStage = 0;
         const interval = setInterval(() => {
             if (currentStage < loadingStages.length) {

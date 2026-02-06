@@ -37,18 +37,20 @@ export default function Navbar() {
 
         if ("speechSynthesis" in window) {
             const utterance = new SpeechSynthesisUtterance(aiPitchScript);
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            utterance.volume = 0.8;
+            utterance.rate = 0.85;
+            utterance.pitch = 0.8; // Lower pitch for male voice
+            utterance.volume = 0.9;
 
-            // Try to get a good voice
+            // Try to get a male voice
             const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(
+            const maleVoice = voices.find(
+                v => v.lang.startsWith("en") && (v.name.includes("Male") || v.name.includes("David") || v.name.includes("James") || v.name.includes("Mark"))
+            ) || voices.find(
                 v => v.lang.startsWith("en") && v.name.includes("Google")
             ) || voices.find(v => v.lang.startsWith("en"));
 
-            if (preferredVoice) {
-                utterance.voice = preferredVoice;
+            if (maleVoice) {
+                utterance.voice = maleVoice;
             }
 
             utterance.onend = () => setIsSpeaking(false);
