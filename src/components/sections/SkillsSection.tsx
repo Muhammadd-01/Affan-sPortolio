@@ -244,7 +244,7 @@ export default function SkillsSection() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="flex flex-wrap justify-center gap-3 mb-12"
+                    className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 px-2"
                 >
                     {skills.map((category, index) => {
                         const Icon = category.icon;
@@ -254,7 +254,7 @@ export default function SkillsSection() {
                                 key={category.category}
                                 onClick={() => setActiveCategory(category.category)}
                                 className={cn(
-                                    "relative flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all overflow-hidden",
+                                    "relative flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-medium transition-all overflow-hidden text-xs sm:text-sm",
                                     isActive
                                         ? "text-background"
                                         : "glass hover:bg-glass-white text-foreground/70"

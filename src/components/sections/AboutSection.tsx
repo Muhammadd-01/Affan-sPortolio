@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { aboutContent } from "@/data/portfolio";
 import { Calendar, Sparkles, Target, Rocket, Heart, Code2 } from "lucide-react";
 
@@ -11,7 +11,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
-    useState(() => {
+    useEffect(() => {
         if (isInView) {
             const duration = 2000;
             const steps = 60;
@@ -28,7 +28,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
             }, duration / steps);
             return () => clearInterval(timer);
         }
-    });
+    }, [isInView, value]);
 
     return (
         <span ref={ref} className="tabular-nums">
@@ -222,7 +222,7 @@ export default function AboutSection() {
                             href="https://nexovate-digital.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="glass rounded-2xl p-6 relative overflow-hidden group flex items-center gap-6 cursor-pointer"
+                            className="glass rounded-2xl p-6 relative overflow-hidden group flex flex-col sm:flex-row items-center sm:items-start gap-6 cursor-pointer"
                             whileHover={{ y: -5, scale: 1.02 }}
                         >
                             <motion.div

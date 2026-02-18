@@ -242,7 +242,7 @@ export default function HeroSection() {
                 {/* Main Heading with Glitch */}
                 <motion.h1
                     variants={itemVariants}
-                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-heading font-bold mb-4"
+                    className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 px-2"
                 >
                     <span className="text-foreground">Hi, I&apos;m </span>
                     <GlitchText text={personalInfo.name} className="text-gradient" />
@@ -277,7 +277,7 @@ export default function HeroSection() {
                 {/* Stats */}
                 <motion.div
                     variants={itemVariants}
-                    className="flex justify-center gap-12 mb-12"
+                    className="flex flex-wrap justify-center gap-6 sm:gap-12 mb-12"
                 >
                     <StatCard value="50+" label="Projects" delay={1.5} />
                     <StatCard value="4+" label="Years Exp" delay={1.7} />
@@ -313,7 +313,7 @@ export default function HeroSection() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <span className="relative z-10 flex items-center gap-2 group-hover:text-background transition-colors">
+                        <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
                             <Mail className="w-5 h-5" />
                             Contact Me
                         </span>

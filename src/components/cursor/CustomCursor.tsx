@@ -14,12 +14,15 @@ interface CursorState {
 }
 
 export default function CustomCursor() {
+    const [isMobile, setIsMobile] = useState(false);
+    const [hasMoved, setHasMoved] = useState(false);
+
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
 
     const [cursorState, setCursorState] = useState<CursorState>({
         isPointer: false,
-        isHidden: false,
+        isHidden: true, // Initial hidden
         techColor: null,
         techName: null,
         scale: 1,
@@ -29,21 +32,35 @@ export default function CustomCursor() {
     const [codeTrails, setCodeTrails] = useState<{ id: number; x: number; y: number; char: string }[]>([]);
     const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
 
-    // Smooth spring for cursor
-    const springConfig = { damping: 20, stiffness: 300 };
+    // Stiffer spring for main cursor to match system feel
+    const springConfig = { damping: 25, stiffness: 450, mass: 0.5 };
     const cursorXSpring = useSpring(cursorX, springConfig);
     const cursorYSpring = useSpring(cursorY, springConfig);
 
-    // Trail with more lag
-    const trailConfig = { damping: 30, stiffness: 150 };
+    // Trail with slightly more lag but less bounce
+    const trailConfig = { damping: 30, stiffness: 200, mass: 0.8 };
     const trailXSpring = useSpring(cursorX, trailConfig);
     const trailYSpring = useSpring(cursorY, trailConfig);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
         const codeChars = ['<', '>', '/', '{', '}', '(', ')', ';', '0', '1'];
 
-        cursorX.set(e.clientX);
-        cursorY.set(e.clientY);
+        // Fix jump: if this is the first move, jump there instantly
+        if (!hasMoved) {
+            cursorX.set(e.clientX);
+            cursorY.set(e.clientY);
+            // Jump the springs to current mouse position to prevent animation from -100
+            cursorXSpring.set(e.clientX);
+            cursorYSpring.set(e.clientY);
+            trailXSpring.set(e.clientX);
+            trailYSpring.set(e.clientY);
+
+            setHasMoved(true);
+            setCursorState(prev => ({ ...prev, isHidden: false }));
+        } else {
+            cursorX.set(e.clientX);
+            cursorY.set(e.clientY);
+        }
 
         // Add code trails on movement
         const dx = e.clientX - lastPos.x;
@@ -58,7 +75,7 @@ export default function CustomCursor() {
                 { id: Date.now() + Math.random(), x: e.clientX, y: e.clientY, char }
             ]);
         }
-    }, [cursorX, cursorY, lastPos]);
+    }, [cursorX, cursorY, lastPos, hasMoved]);
 
     const handleMouseOver = useCallback((e: MouseEvent) => {
         const target = e.target as HTMLElement;
@@ -96,18 +113,33 @@ export default function CustomCursor() {
     }, []);
 
     const handleMouseEnter = useCallback(() => {
-        setCursorState(prev => ({ ...prev, isHidden: false }));
-    }, []);
+        // Only show if we've actually moved once
+        if (hasMoved) {
+            setCursorState(prev => ({ ...prev, isHidden: false }));
+        }
+    }, [hasMoved]);
 
     useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-        document.addEventListener("mouseover", handleMouseOver);
-        document.addEventListener("mousedown", handleMouseDown);
-        document.addEventListener("mouseup", handleMouseUp);
-        document.addEventListener("mouseleave", handleMouseLeave);
-        document.addEventListener("mouseenter", handleMouseEnter);
+        // Check for mobile/touch
+        const checkMobile = () => {
+            const mobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 768;
+            setIsMobile(mobile);
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+
+        if (!isMobile) {
+            window.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseover", handleMouseOver);
+            document.addEventListener("mousedown", handleMouseDown);
+            document.addEventListener("mouseup", handleMouseUp);
+            document.addEventListener("mouseleave", handleMouseLeave);
+            document.addEventListener("mouseenter", handleMouseEnter);
+        }
 
         return () => {
+            window.removeEventListener("resize", checkMobile);
             window.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseover", handleMouseOver);
             document.removeEventListener("mousedown", handleMouseDown);
@@ -115,7 +147,10 @@ export default function CustomCursor() {
             document.removeEventListener("mouseleave", handleMouseLeave);
             document.removeEventListener("mouseenter", handleMouseEnter);
         };
-    }, [handleMouseMove, handleMouseOver, handleMouseDown, handleMouseUp, handleMouseLeave, handleMouseEnter]);
+    }, [isMobile, handleMouseMove, handleMouseOver, handleMouseDown, handleMouseUp, handleMouseLeave, handleMouseEnter]);
+
+    // If mobile, don't render anything
+    if (isMobile) return null;
 
     // Cleanup trails
     useEffect(() => {
@@ -155,8 +190,8 @@ export default function CustomCursor() {
             <AnimatePresence>
                 {cursorState.techName && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         className="fixed pointer-events-none z-[9999] px-2 py-1 rounded font-mono text-xs whitespace-nowrap"
                         style={{

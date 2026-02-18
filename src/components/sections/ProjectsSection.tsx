@@ -119,14 +119,14 @@ export default function ProjectsSection() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="flex flex-wrap justify-center gap-3 mb-12"
+                    className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 px-2"
                 >
                     {categories.map((category, index) => (
                         <motion.button
                             key={category}
                             onClick={() => setFilter(category)}
                             className={cn(
-                                "relative px-6 py-2.5 rounded-full font-medium transition-all text-sm overflow-hidden",
+                                "relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-medium transition-all text-xs sm:text-sm overflow-hidden",
                                 filter === category
                                     ? "text-background"
                                     : "glass hover:bg-glass-white text-foreground/70"

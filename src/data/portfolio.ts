@@ -193,14 +193,6 @@ export const navLinks = [
     { name: "Contact", href: "#contact" },
 ];
 
-export const aiPitchScript = `
-Hello! I'm Affan, a passionate full-stack developer and creative technologist. 
-I specialize in building stunning web experiences that combine cutting-edge technology 
-with exceptional design. From React and Next.js on the frontend to Node.js and Python 
-on the backend, I bring ideas to life with pixel-perfect precision and buttery-smooth 
-animations. Whether you need a powerful web application, a mobile app, or a complete 
-digital transformation, I'm here to make it happen. Let's create something amazing together!
-`;
 
 export const techColorMap: Record<string, string> = {
     React: "#61DAFB",

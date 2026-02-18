@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Volume2, VolumeX } from "lucide-react";
-import { navLinks, aiPitchScript, personalInfo } from "@/data/portfolio";
+import { navLinks, personalInfo } from "@/data/portfolio";
+import { aiPitchScript } from "@/data/pitch";
 import { useActiveSection, useSmoothScroll } from "@/hooks/useNavigation";
 import { cn } from "@/lib/utils";
 
@@ -35,29 +36,66 @@ export default function Navbar() {
             return;
         }
 
-        if ("speechSynthesis" in window) {
+        if (!("speechSynthesis" in window)) {
+            console.error("Speech synthesis not supported");
+            return;
+        }
+
+        const startSpeaking = () => {
+            // Cancel any current speech for immediate start
+            window.speechSynthesis.cancel();
+
             const utterance = new SpeechSynthesisUtterance(aiPitchScript);
-            utterance.rate = 0.85;
-            utterance.pitch = 0.8; // Lower pitch for male voice
-            utterance.volume = 0.9;
 
-            // Try to get a male voice
+            // Deep, realistic male voice settings
+            utterance.rate = 0.82;
+            utterance.pitch = 0.75;
+            utterance.volume = 1.0;
+
             const voices = window.speechSynthesis.getVoices();
-            const maleVoice = voices.find(
-                v => v.lang.startsWith("en") && (v.name.includes("Male") || v.name.includes("David") || v.name.includes("James") || v.name.includes("Mark"))
-            ) || voices.find(
-                v => v.lang.startsWith("en") && v.name.includes("Google")
-            ) || voices.find(v => v.lang.startsWith("en"));
 
-            if (maleVoice) {
-                utterance.voice = maleVoice;
+            // Priority list for deep, realistic English voices
+            const preferredVoices = [
+                "Google UK English Male",
+                "Microsoft David",
+                "Microsoft James",
+                "en-GB",
+                "en-US",
+            ];
+
+            let selectedVoice = null;
+            for (const name of preferredVoices) {
+                selectedVoice = voices.find(v => v.name.includes(name) || v.lang.includes(name));
+                if (selectedVoice) break;
             }
 
+            if (!selectedVoice) {
+                selectedVoice = voices.find(v => v.lang.startsWith("en"));
+            }
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+
+            utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
+            utterance.onerror = (event) => {
+                console.error("Speech synthesis error", event);
+                setIsSpeaking(false);
+            };
 
             window.speechSynthesis.speak(utterance);
-            setIsSpeaking(true);
+        };
+
+        // On mobile/Chrome, voices might not be loaded yet
+        if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                startSpeaking();
+                // Remove the listener once started
+                window.speechSynthesis.onvoiceschanged = null;
+            };
+        } else {
+            startSpeaking();
         }
     };
 
