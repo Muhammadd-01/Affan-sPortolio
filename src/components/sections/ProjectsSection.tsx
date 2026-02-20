@@ -1,562 +1,589 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
-import { projects } from "@/data/portfolio";
-import { ExternalLink, Github, X, Eye, Code, ChevronRight, Layers } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, useInView, AnimatePresence, LayoutGroup } from "framer-motion";
+import { ExternalLink, X, Star, ChevronRight, Code, Smartphone, Globe, Github } from "lucide-react";
 
-interface Project {
-    id: number;
-    title: string;
-    description: string;
-    longDescription: string;
-    image: string;
-    tech: string[];
-    liveUrl: string;
-    githubUrl: string;
-    featured: boolean;
-    category: string;
-}
+const projects = [
+    {
+        id: 1,
+        title: "Recipe Explorer",
+        category: "Website",
+        image: "/recipe.png",
+        description: "A deliciously responsive recipe site featuring step-by-step cooking instructions, ingredient filters, and user-submitted dishes.",
+        technologies: ["HTML", "CSS", "JavaScript", "Bootstrap"],
+        github: "https://github.com/Muhammadd-01/Recipe_App.git",
+        live: "https://recipe-app-two-weld.vercel.app",
+        featured: false,
+        color: "#00E5FF",
+    },
+    {
+        id: 2,
+        title: "To-Do List App",
+        category: "Website",
+        image: "/todo.png",
+        description: "A powerful to-do list app with task management, priority filtering, and a sleek UI built with local storage persistence.",
+        technologies: ["React", "Local Storage", "Tailwind CSS"],
+        github: "https://github.com/Muhammadd-01/To-Do_App.git",
+        live: "https://to-do-app-silk-nu.vercel.app",
+        featured: false,
+        color: "#8B5CF6",
+    },
+    {
+        id: 9,
+        title: "Dar ul Ruqyah",
+        category: "Website",
+        image: "/darulruqyah.png",
+        description: "Islamic Paranormal Investigation website providing guidance and Ruqyah services online with a spiritual modern design.",
+        technologies: ["React", "TailwindCSS", "Vite"],
+        github: "https://github.com/Muhammadd-01/Paranormal_investigating_website.git",
+        live: "https://dar-ul-ruqyah.vercel.app/",
+        featured: true,
+        color: "#00FF9C",
+    },
+    {
+        id: 10,
+        title: "Al Ghani Quran Institute",
+        category: "Website",
+        image: "/alghani.png",
+        description: "Official website for Al Ghani Quran Institute offering online courses and Quran learning resources.",
+        technologies: ["React", "TailwindCSS", "Vite"],
+        github: "https://github.com/Muhammadd-01/AL_Ghani_Quran_Academy.git",
+        live: "https://al-ghani-quran-academy.vercel.app/",
+        featured: true,
+        color: "#FF006E",
+    },
+    {
+        id: 3,
+        title: "Elegance Barber Salon",
+        category: "Web Application",
+        image: "/salon.png",
+        description: "A modern barber salon booking system with appointment scheduling, customer management, and payment integration.",
+        technologies: ["PHP", "Laravel", "MySQL"],
+        github: "https://github.com/Muhammadd-01/ElaganceSalon.git",
+        live: "#",
+        featured: false,
+        color: "#00E5FF",
+    },
+    {
+        id: 4,
+        title: "Auction Bidding Site",
+        category: "Web Application",
+        image: "/auction.png",
+        description: "A real-time auction bidding platform with user authentication, live bids, and comprehensive admin controls.",
+        technologies: ["C#", "ASP.NET Core", "SQL Server"],
+        github: "https://github.com/Muhammadd-01/Auction_Project.git",
+        live: "#",
+        featured: false,
+        color: "#8B5CF6",
+    },
+    {
+        id: 5,
+        title: "Medicare Website",
+        category: "Web Application",
+        image: "/medicare.png",
+        description: "A medical website that suggests medicines based on symptoms, with dosage levels and secure feedback.",
+        technologies: ["React", "Vite", "TailwindCSS"],
+        github: "https://github.com/Muhammadd-01/Official-Medicare.git",
+        live: "https://official-medicare.vercel.app",
+        featured: true,
+        color: "#00FF9C",
+    },
+    {
+        id: 6,
+        title: "Archive Site",
+        category: "Web Application",
+        image: "/archive.png",
+        description: "A digital archive platform for storing, categorizing, and exploring historical records with smooth filtering.",
+        technologies: ["React", "Vite", "JavaScript"],
+        github: "https://github.com/Muhammadd-01/archieveSite.git",
+        live: "https://archieve-site.vercel.app",
+        featured: false,
+        color: "#FF006E",
+    },
+    {
+        id: 7,
+        title: "Fitness Tracker App",
+        category: "Mobile App",
+        image: "/fitness.png",
+        description: "A mobile app for tracking workouts, diet, and progress with real-time analytics and push notifications.",
+        technologies: ["Flutter", "Firebase", "Dart"],
+        github: "https://github.com/Muhammadd-01/FitnessTrackerApp.git",
+        live: "#",
+        featured: false,
+        color: "#00E5FF",
+    },
+    {
+        id: 11,
+        title: "WatchHub",
+        category: "Mobile App",
+        image: "/watchhub.png",
+        description: "A mobile video streaming app to watch trending content with a clean, engaging interface.",
+        technologies: ["Flutter", "Firebase"],
+        github: "https://github.com/Muhammadd-01/WatchHub_Project.git",
+        live: "#",
+        featured: false,
+        color: "#8B5CF6",
+    },
+    {
+        id: 13,
+        title: "Currency Converter",
+        category: "Mobile App",
+        image: "/currency.png",
+        description: "A mobile app for converting currencies with live exchange rates and historical data charts.",
+        technologies: ["Flutter", "API", "Dart"],
+        github: "#",
+        live: "#",
+        featured: false,
+        color: "#00FF9C",
+    },
+];
 
-export default function ProjectsSection() {
-    const ref = useRef<HTMLElement>(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
-    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const [filter, setFilter] = useState("All");
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
+type Project = (typeof projects)[0];
 
-    const categories = ["All", ...Array.from(new Set(projects.map(p => p.category)))];
-    const filteredProjects = filter === "All"
-        ? projects
-        : projects.filter(p => p.category === filter);
-
+function FallbackVisual({ category, color }: { category: string; color: string }) {
+    const Icon = category === "Mobile App" ? Smartphone : category === "Web Application" ? Code : Globe;
     return (
-        <section
-            id="projects"
-            ref={ref}
-            className="section relative py-32 overflow-hidden"
-        >
-            {/* Animated Background */}
-            <div className="absolute inset-0 pointer-events-none">
-                <motion.div
-                    className="gradient-orb gradient-orb-purple w-[600px] h-[600px] -top-20 -left-48"
-                    animate={{
-                        x: [0, 50, 0],
-                        y: [0, 30, 0],
-                        scale: [1, 1.1, 1],
-                    }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                    className="gradient-orb gradient-orb-blue w-[500px] h-[500px] bottom-0 right-0"
-                    animate={{
-                        x: [0, -30, 0],
-                        y: [0, -50, 0],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                />
-            </div>
-
-            {/* Hex pattern */}
-            <div className="absolute inset-0 pointer-events-none opacity-5" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.32v25.36L30 60 0 42.68V17.32z' fill='none' stroke='%2300E5FF' stroke-width='0.5'/%3E%3C/svg%3E")`,
-                backgroundSize: "60px 60px",
-            }} />
-
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
-                {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
-                    <motion.div
-                        className="inline-flex items-center gap-2 text-neon-purple text-sm font-medium uppercase tracking-widest mb-4"
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    >
-                        <Layers className="w-4 h-4" />
-                        Featured Work
-                    </motion.div>
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
-                        My{" "}
-                        <span className="relative inline-block">
-                            <span className="text-gradient">Projects</span>
-                            <motion.svg
-                                className="absolute -bottom-2 left-0 w-full"
-                                viewBox="0 0 200 10"
-                                initial={{ pathLength: 0 }}
-                                animate={isInView ? { pathLength: 1 } : {}}
-                                transition={{ delay: 0.5, duration: 1 }}
-                            >
-                                <motion.path
-                                    d="M0 5 Q50 0 100 5 T200 5"
-                                    fill="none"
-                                    stroke="url(#gradient)"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                />
-                                <defs>
-                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stopColor="#8B5CF6" />
-                                        <stop offset="50%" stopColor="#00E5FF" />
-                                        <stop offset="100%" stopColor="#00FF9C" />
-                                    </linearGradient>
-                                </defs>
-                            </motion.svg>
-                        </span>
-                    </h2>
-                    <p className="text-foreground/60 max-w-xl mx-auto mt-4">
-                        A showcase of my best work. Each project represents a unique challenge solved with creativity and code.
-                    </p>
-                </motion.div>
-
-                {/* Filter Tabs */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ delay: 0.2, duration: 0.5 }}
-                    className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-12 px-2"
-                >
-                    {categories.map((category, index) => (
-                        <motion.button
-                            key={category}
-                            onClick={() => setFilter(category)}
-                            className={cn(
-                                "relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-medium transition-all text-xs sm:text-sm overflow-hidden",
-                                filter === category
-                                    ? "text-background"
-                                    : "glass hover:bg-glass-white text-foreground/70"
-                            )}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                        >
-                            {filter === category && (
-                                <motion.div
-                                    layoutId="activeProjectTab"
-                                    className="absolute inset-0 bg-gradient-to-r from-neon-purple to-neon-blue"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                            <span className="relative z-10">{category}</span>
-                        </motion.button>
-                    ))}
-                </motion.div>
-
-                {/* Projects Grid */}
-                <motion.div
-                    layout
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-                >
-                    <AnimatePresence mode="popLayout">
-                        {filteredProjects.map((project, index) => (
-                            <ProjectCard3D
-                                key={project.id}
-                                project={project}
-                                index={index}
-                                isInView={isInView}
-                                onClick={() => setSelectedProject(project)}
-                                isHovered={hoveredId === project.id}
-                                onHover={() => setHoveredId(project.id)}
-                                onLeave={() => setHoveredId(null)}
-                            />
-                        ))}
-                    </AnimatePresence>
-                </motion.div>
-            </div>
-
-            {/* Project Modal */}
-            <AnimatePresence>
-                {selectedProject && (
-                    <ProjectModal
-                        project={selectedProject}
-                        onClose={() => setSelectedProject(null)}
-                    />
-                )}
-            </AnimatePresence>
-        </section>
+        <div className="absolute inset-0 flex items-center justify-center"
+            style={{ background: `radial-gradient(circle, ${color}15 0%, transparent 70%)` }}>
+            <Icon size={48} style={{ color, filter: `drop-shadow(0 0 20px ${color})` }} />
+        </div>
     );
 }
 
-function ProjectCard3D({
-    project,
-    index,
-    isInView,
-    onClick,
-    isHovered,
-    onHover,
-    onLeave,
-}: {
-    project: Project;
-    index: number;
-    isInView: boolean;
-    onClick: () => void;
-    isHovered: boolean;
-    onHover: () => void;
-    onLeave: () => void;
-}) {
+// ── Dark Modal — no scrollbars ───────────────────────────────────────────────
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+    const [imgErr, setImgErr] = useState(false);
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = ""; };
+    }, []);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.93)", backdropFilter: "blur(18px)" }}
+        >
+            <motion.div
+                initial={{ scale: 0.82, opacity: 0, y: 40 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.86, opacity: 0, y: 24 }}
+                transition={{ type: "spring", stiffness: 300, damping: 28 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-xl rounded-3xl"
+                style={{
+                    background: "#0c0c0c",
+                    border: `1px solid ${project.color}45`,
+                    boxShadow: `0 0 80px ${project.color}18, 0 0 160px ${project.color}08, inset 0 0 60px ${project.color}04`,
+                    overflow: "hidden",
+                }}
+            >
+                <div className="absolute top-0 left-0 w-40 h-40 pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${project.color}10 0%, transparent 70%)` }} />
+                <div className="absolute bottom-0 right-0 w-40 h-40 pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${project.color}07 0%, transparent 70%)` }} />
+
+                <button onClick={onClose}
+                    className="absolute top-4 right-4 z-30 w-9 h-9 rounded-full flex items-center justify-center transition-all"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <X size={15} className="text-foreground/60 hover:text-foreground transition-colors" />
+                </button>
+
+                <div className="relative h-48 flex-shrink-0" style={{ overflow: "hidden" }}>
+                    {imgErr
+                        ? <FallbackVisual category={project.category} color={project.color} />
+                        : <img src={project.image} alt={project.title} className="w-full h-full object-cover" onError={() => setImgErr(true)} />
+                    }
+                    <div className="absolute inset-0"
+                        style={{ background: `linear-gradient(to bottom, transparent 20%, #0c0c0c 100%)` }} />
+                    <div className="absolute bottom-3 left-5">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold"
+                            style={{ background: `${project.color}18`, border: `1px solid ${project.color}50`, color: project.color }}>
+                            {project.category}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="px-6 pb-7 pt-1">
+                    <h2 className="text-2xl font-heading font-bold mb-2"
+                        style={{ color: "#EDEDED", textShadow: `0 0 25px ${project.color}45` }}>
+                        {project.title}
+                    </h2>
+                    <p className="text-foreground/55 text-sm leading-relaxed mb-5">{project.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {project.technologies.map((t) => (
+                            <span key={t} className="px-3 py-1 rounded-lg text-xs font-medium"
+                                style={{ background: `${project.color}10`, border: `1px solid ${project.color}30`, color: project.color }}>
+                                {t}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex gap-3">
+                        {project.github !== "#" && (
+                            <motion.a href={project.github} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium"
+                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#EDEDED" }}
+                                whileHover={{ scale: 1.04, borderColor: "rgba(255,255,255,0.28)" }} whileTap={{ scale: 0.96 }}>
+                                <Github size={14} /> GitHub
+                            </motion.a>
+                        )}
+                        {project.live !== "#" && (
+                            <motion.a href={project.live} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium"
+                                style={{ background: `${project.color}20`, border: `1px solid ${project.color}55`, color: project.color }}
+                                whileHover={{ scale: 1.04, boxShadow: `0 0 22px ${project.color}35` }} whileTap={{ scale: 0.96 }}>
+                                <ExternalLink size={14} /> Live Demo
+                            </motion.a>
+                        )}
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+// ── Project Card — drops in from top on filter change ────────────────────────
+function ProjectCard({ project, index, onClick }: { project: Project; index: number; onClick: (p: Project) => void }) {
+    const [hovered, setHovered] = useState(false);
+    const [imgErr, setImgErr] = useState(false);
+    const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
     const cardRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
 
-    const mouseXSpring = useSpring(x, { stiffness: 500, damping: 100 });
-    const mouseYSpring = useSpring(y, { stiffness: 500, damping: 100 });
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
-    const translateZ = useTransform(mouseXSpring, [-0.5, 0.5], ["-10px", "10px"]);
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        const xPct = (e.clientX - rect.left) / rect.width - 0.5;
-        const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
+    const onMove = (e: React.MouseEvent) => {
+        const el = cardRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        setMouse({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
     };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-        onLeave();
-    };
-
-    // Generate gradient based on project
-    const gradientColors = [
-        "from-neon-blue/30 via-neon-purple/20 to-neon-green/30",
-        "from-neon-purple/30 via-neon-blue/20 to-neon-green/30",
-        "from-neon-green/30 via-neon-blue/20 to-neon-purple/30",
-    ];
 
     return (
         <motion.div
             ref={cardRef}
             layout
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ delay: index * 0.1, duration: 0.5 }}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={onHover}
-            onMouseLeave={handleMouseLeave}
-            onClick={onClick}
-            style={{
-                rotateX,
-                rotateY,
-                transformStyle: "preserve-3d",
-            }}
-            className="group cursor-pointer perspective-1000"
+            // Fly in from the TOP each time cards are (re)rendered after a filter change
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.4, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => { setHovered(false); setMouse({ x: 0.5, y: 0.5 }); }}
+            onMouseMove={onMove}
+            onClick={() => onClick(project)}
+            className="relative group cursor-pointer"
         >
             <motion.div
-                className="relative glass rounded-2xl overflow-hidden h-full"
-                style={{
-                    boxShadow: isHovered
-                        ? "0 25px 50px -12px rgba(139, 92, 246, 0.4), 0 0 30px rgba(0, 229, 255, 0.2)"
-                        : "none",
+                className="relative rounded-2xl overflow-hidden border"
+                animate={{
+                    borderColor: hovered ? `${project.color}55` : "rgba(255,255,255,0.06)",
+                    boxShadow: hovered ? `0 0 40px ${project.color}18, inset 0 0 30px ${project.color}06` : "0 0 0px transparent",
                 }}
+                style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.01) 100%)" }}
+                transition={{ duration: 0.25 }}
             >
-                {/* Image/Gradient Area */}
-                <div className={cn(
-                    "relative h-56 bg-gradient-to-br overflow-hidden",
-                    gradientColors[index % 3]
-                )}>
-                    {/* Animated pattern */}
+                {project.featured && (
                     <motion.div
-                        className="absolute inset-0 opacity-30"
-                        animate={{
-                            backgroundPosition: ["0% 0%", "100% 100%"],
-                        }}
-                        transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
-                        style={{
-                            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(0, 229, 255, 0.3) 0%, transparent 50%),
-                               radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)`,
-                            backgroundSize: "200% 200%",
-                        }}
-                    />
-
-                    {/* Large letter */}
-                    <motion.div
-                        className="absolute inset-0 flex items-center justify-center"
-                        style={{ translateZ: "30px" }}
-                    >
-                        <span className="text-[120px] font-heading font-bold text-white/5 select-none">
-                            {project.title.charAt(0)}
-                        </span>
+                        className="absolute top-3 left-3 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                        style={{ background: project.color, color: "#0A0A0A" }}
+                        animate={{ boxShadow: [`0 0 8px ${project.color}90`, `0 0 22px ${project.color}`, `0 0 8px ${project.color}90`] }}
+                        transition={{ duration: 2, repeat: Infinity }}>
+                        <Star size={10} className="fill-current" /> Featured
                     </motion.div>
+                )}
 
-                    {/* Floating preview icon */}
-                    <motion.div
-                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ translateZ: "50px" }}
-                    >
-                        <motion.div
-                            className="p-4 rounded-full glass"
-                            whileHover={{ scale: 1.1 }}
-                            animate={isHovered ? { y: [0, -5, 0] } : {}}
-                            transition={{ duration: 1, repeat: Infinity }}
-                        >
-                            <Eye className="w-8 h-8 text-white" />
-                        </motion.div>
+                <div className="relative h-48" style={{ overflow: "hidden" }}>
+                    {imgErr
+                        ? <FallbackVisual category={project.category} color={project.color} />
+                        : <motion.img src={project.image} alt={project.title} className="w-full h-full object-cover"
+                            animate={{ scale: hovered ? 1.07 : 1 }} transition={{ duration: 0.45, ease: "easeOut" }}
+                            onError={() => setImgErr(true)} />
+                    }
+                    <div className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.08) 60%)" }} />
+                    <motion.div className="absolute inset-0 flex items-center justify-center"
+                        animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.22 }}
+                        style={{ background: `radial-gradient(circle, ${project.color}22 0%, transparent 70%)` }}>
+                        <motion.span
+                            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={hovered ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.18 }}
+                            style={{ background: `${project.color}22`, border: `1px solid ${project.color}60`, color: project.color }}>
+                            View Details <ChevronRight size={13} />
+                        </motion.span>
                     </motion.div>
-
-                    {/* Featured Badge */}
-                    {project.featured && (
-                        <motion.div
-                            className="absolute top-4 right-4 px-3 py-1.5 rounded-full glass border border-neon-green/50 backdrop-blur-md"
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: index * 0.1 + 0.3 }}
-                            style={{ translateZ: "20px" }}
-                        >
-                            <span className="text-neon-green text-xs font-medium flex items-center gap-1">
-                                <motion.span
-                                    className="w-1.5 h-1.5 rounded-full bg-neon-green"
-                                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                />
-                                Featured
-                            </span>
-                        </motion.div>
-                    )}
-
-                    {/* Category tag */}
-                    <div
-                        className="absolute bottom-4 left-4 px-3 py-1 rounded-full glass text-xs text-foreground/70"
-                    >
-                        {project.category}
-                    </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-6" style={{ transform: "translateZ(25px)" }}>
-                    <motion.h3
-                        className="text-xl font-heading font-bold mb-2 group-hover:text-neon-blue transition-colors flex items-center gap-2"
-                    >
+                <div className="p-5">
+                    <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: project.color }}>
+                        {project.category}
+                    </span>
+                    <h3 className="text-base font-bold font-heading mt-1.5 mb-2 transition-colors duration-200"
+                        style={{ color: hovered ? project.color : "#EDEDED" }}>
                         {project.title}
-                        <motion.span
-                            animate={isHovered ? { x: [0, 5, 0] } : {}}
-                            transition={{ duration: 0.5, repeat: Infinity }}
-                        >
-                            <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </motion.span>
-                    </motion.h3>
-
-                    <p className="text-foreground/60 text-sm mb-4 line-clamp-2">
-                        {project.description}
-                    </p>
-
-                    {/* Tech Stack */}
-                    <div className="flex flex-wrap gap-2">
-                        {project.tech.slice(0, 4).map((tech, i) => (
-                            <motion.span
-                                key={tech}
-                                data-tech={tech}
-                                className="px-2.5 py-1 text-xs rounded-lg bg-glass-white text-foreground/70 border border-glass-border"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.05 }}
-                                whileHover={{
-                                    scale: 1.1,
-                                    backgroundColor: "rgba(0, 229, 255, 0.1)",
-                                    borderColor: "rgba(0, 229, 255, 0.3)",
-                                }}
-                            >
-                                {tech}
-                            </motion.span>
-                        ))}
-                        {project.tech.length > 4 && (
-                            <span className="px-2.5 py-1 text-xs rounded-lg glass text-foreground/50">
-                                +{project.tech.length - 4} more
+                    </h3>
+                    <p className="text-foreground/45 text-sm line-clamp-2 mb-4">{project.description}</p>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                        {project.technologies.slice(0, 3).map((t) => (
+                            <span key={t} className="px-2 py-0.5 rounded-md text-xs border"
+                                style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)", color: "rgba(237,237,237,0.55)" }}>
+                                {t}
                             </span>
+                        ))}
+                        {project.technologies.length > 3 && (
+                            <span className="px-2 py-0.5 rounded-md text-xs font-medium"
+                                style={{ background: `${project.color}15`, border: `1px solid ${project.color}35`, color: project.color }}>
+                                +{project.technologies.length - 3}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex gap-2">
+                        {project.github !== "#" && (
+                            <motion.a href={project.github} target="_blank" rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.92 }}>
+                                <Github size={13} className="text-foreground/55" />
+                            </motion.a>
+                        )}
+                        {project.live !== "#" && (
+                            <motion.a href={project.live} target="_blank" rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style={{ background: `${project.color}18`, border: `1px solid ${project.color}45`, color: project.color }}
+                                whileHover={{ scale: 1.12, boxShadow: `0 0 15px ${project.color}40` }} whileTap={{ scale: 0.92 }}>
+                                <ExternalLink size={13} />
+                            </motion.a>
                         )}
                     </div>
                 </div>
 
-                {/* Hover glow effect */}
-                <motion.div
-                    className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                        background: "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, transparent 50%, rgba(0, 229, 255, 0.1) 100%)",
-                    }}
-                />
+                <div className="absolute inset-0 pointer-events-none" style={{
+                    opacity: hovered ? 1 : 0,
+                    transition: "opacity 0.25s ease",
+                    background: `radial-gradient(circle at ${mouse.x * 100}% ${mouse.y * 100}%, ${project.color}0C 0%, transparent 55%)`,
+                }} />
             </motion.div>
         </motion.div>
     );
 }
 
-function ProjectModal({
-    project,
-    onClose,
-}: {
-    project: Project;
-    onClose: () => void;
-}) {
+// ── Featured hero-style card ──────────────────────────────────────────────────
+function FeaturedProjectCard({ project, onClick, reverse }: { project: Project; onClick: (p: Project) => void; reverse?: boolean }) {
+    const [hovered, setHovered] = useState(false);
+    const [imgErr, setImgErr] = useState(false);
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
-            onClick={onClose}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+            onClick={() => onClick(project)}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="cursor-pointer"
         >
-            {/* Backdrop */}
             <motion.div
-                className="absolute inset-0 bg-background/95 backdrop-blur-xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-            />
-
-            {/* Modal */}
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 50 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 50 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="relative glass-strong rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
-                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                className="grid md:grid-cols-2 rounded-3xl overflow-hidden border"
+                animate={{
+                    borderColor: hovered ? `${project.color}55` : "rgba(255,255,255,0.06)",
+                    boxShadow: hovered ? `0 0 60px ${project.color}18` : "none",
+                }}
+                style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))" }}
+                transition={{ duration: 0.3 }}
             >
-                {/* Header Image */}
-                <div className="relative h-72 bg-gradient-to-br from-neon-blue/30 via-neon-purple/30 to-neon-green/30 overflow-hidden">
-                    {/* Animated background */}
-                    <motion.div
-                        className="absolute inset-0"
-                        animate={{
-                            background: [
-                                "radial-gradient(circle at 20% 50%, rgba(0, 229, 255, 0.4) 0%, transparent 50%)",
-                                "radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.4) 0%, transparent 50%)",
-                                "radial-gradient(circle at 50% 80%, rgba(0, 255, 156, 0.4) 0%, transparent 50%)",
-                            ],
-                        }}
-                        transition={{ duration: 5, repeat: Infinity }}
-                    />
-
-                    {/* Large letter */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <motion.span
-                            className="text-[200px] font-heading font-bold text-white/10"
-                            animate={{ rotate: [0, 5, -5, 0] }}
-                            transition={{ duration: 10, repeat: Infinity }}
-                        >
-                            {project.title.charAt(0)}
-                        </motion.span>
-                    </div>
-
-                    {/* Close Button */}
-                    <motion.button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 p-3 rounded-full glass hover:bg-glass-white transition-colors z-10"
-                        whileHover={{ scale: 1.1, rotate: 90 }}
-                        whileTap={{ scale: 0.9 }}
-                    >
-                        <X className="w-6 h-6" />
-                    </motion.button>
-
-                    {/* Featured badge */}
-                    {project.featured && (
-                        <div className="absolute top-4 left-4 px-4 py-2 rounded-full bg-neon-green/20 border border-neon-green/50 text-neon-green text-sm font-medium">
-                            ✨ Featured Project
-                        </div>
-                    )}
+                <div className={`relative h-56 md:h-full ${reverse ? "md:order-2" : ""}`} style={{ overflow: "hidden" }}>
+                    {imgErr
+                        ? <FallbackVisual category={project.category} color={project.color} />
+                        : <motion.img src={project.image} alt={project.title} className="w-full h-full object-cover"
+                            animate={{ scale: hovered ? 1.05 : 1 }} transition={{ duration: 0.5 }}
+                            onError={() => setImgErr(true)} />
+                    }
+                    <div className="absolute inset-0" style={{
+                        background: reverse
+                            ? "linear-gradient(to left, #0A0A0A 0%, transparent 55%)"
+                            : "linear-gradient(to right, #0A0A0A 0%, transparent 55%)",
+                    }} />
                 </div>
-
-                {/* Content */}
-                <div className="p-8 overflow-y-auto max-h-[calc(90vh-18rem)]">
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-                        <div>
-                            <motion.span
-                                className="text-neon-purple text-sm font-medium"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                            >
-                                {project.category}
-                            </motion.span>
-                            <motion.h3
-                                className="text-3xl md:text-4xl font-heading font-bold mt-1"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                            >
-                                {project.title}
-                            </motion.h3>
-                        </div>
+                <div className={`flex flex-col justify-center p-8 ${reverse ? "md:order-1" : ""}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                        <motion.span className="w-2 h-2 rounded-full" style={{ backgroundColor: project.color }}
+                            animate={{ opacity: [1, 0.4, 1], boxShadow: [`0 0 6px ${project.color}`, `0 0 14px ${project.color}`, `0 0 6px ${project.color}`] }}
+                            transition={{ duration: 1.8, repeat: Infinity }} />
+                        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: project.color }}>★ Featured</span>
                     </div>
-
-                    <motion.p
-                        className="text-foreground/70 leading-relaxed mb-8 text-lg"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        {project.longDescription}
-                    </motion.p>
-
-                    {/* Tech Stack */}
-                    <motion.div
-                        className="mb-8"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        <h4 className="text-sm font-medium text-foreground/50 uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <Code className="w-4 h-4" />
-                            Technologies Used
-                        </h4>
-                        <div className="flex flex-wrap gap-3">
-                            {project.tech.map((tech, i) => (
-                                <motion.span
-                                    key={tech}
-                                    data-tech={tech}
-                                    className="px-4 py-2 text-sm rounded-xl glass hover:bg-glass-white transition-all border border-glass-border"
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.4 + i * 0.05 }}
-                                    whileHover={{ scale: 1.05, y: -2 }}
-                                >
-                                    {tech}
-                                </motion.span>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Action Buttons */}
-                    <motion.div
-                        className="flex flex-col sm:flex-row gap-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                    >
-                        <motion.a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-neon-blue to-neon-purple text-white font-semibold"
-                            whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(0, 229, 255, 0.3)" }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            <ExternalLink className="w-5 h-5" />
-                            View Live Demo
-                        </motion.a>
-                        <motion.a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl border-2 border-foreground/20 hover:border-neon-purple font-semibold transition-colors"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            <Github className="w-5 h-5" />
-                            View Source Code
-                        </motion.a>
-                    </motion.div>
+                    <h3 className="text-2xl lg:text-3xl font-heading font-bold mb-3 transition-colors duration-200"
+                        style={{ color: hovered ? project.color : "#EDEDED" }}>
+                        {project.title}
+                    </h3>
+                    <p className="text-foreground/55 mb-5 leading-relaxed text-sm">{project.description}</p>
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                        {project.technologies.map((t) => (
+                            <span key={t} className="px-3 py-1 rounded-lg text-sm"
+                                style={{ background: `${project.color}15`, border: `1px solid ${project.color}40`, color: project.color }}>
+                                {t}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex gap-3">
+                        {project.github !== "#" && (
+                            <motion.a href={project.github} target="_blank" rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium"
+                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#EDEDED" }}
+                                whileHover={{ scale: 1.04, borderColor: "rgba(255,255,255,0.25)" }}>
+                                <Github size={14} /> Code
+                            </motion.a>
+                        )}
+                        {project.live !== "#" && (
+                            <motion.a href={project.live} target="_blank" rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium"
+                                style={{ background: `${project.color}22`, border: `1px solid ${project.color}55`, color: project.color }}
+                                whileHover={{ scale: 1.04, boxShadow: `0 0 20px ${project.color}40` }}>
+                                <ExternalLink size={14} /> Live Demo
+                            </motion.a>
+                        )}
+                    </div>
                 </div>
             </motion.div>
         </motion.div>
+    );
+}
+
+// ── Animated Filter Tabs ──────────────────────────────────────────────────────
+const CATEGORIES = ["All", "Website", "Web Application", "Mobile App"] as const;
+type Category = (typeof CATEGORIES)[number];
+
+function FilterTabs({ active, onChange }: { active: Category; onChange: (c: Category) => void }) {
+    return (
+        <LayoutGroup>
+            <div className="flex flex-wrap justify-center gap-2 mb-14">
+                {CATEGORIES.map((c) => {
+                    const isActive = c === active;
+                    return (
+                        <motion.button
+                            key={c}
+                            onClick={() => onChange(c)}
+                            className="relative px-5 py-2.5 rounded-xl text-sm font-medium outline-none focus:outline-none"
+                            style={{ color: isActive ? "#0A0A0A" : "rgba(237,237,237,0.55)", zIndex: 1 }}
+                            whileHover={{ scale: 1.07, y: -2 }}
+                            whileTap={{ scale: 0.93 }}
+                        >
+                            {isActive && (
+                                <motion.span layoutId="filterPill" className="absolute inset-0 rounded-xl"
+                                    style={{ background: "linear-gradient(135deg, #00E5FF, #8B5CF6, #00FF9C)", zIndex: -1 }}
+                                    transition={{ type: "spring", stiffness: 420, damping: 32 }} />
+                            )}
+                            {!isActive && (
+                                <span className="absolute inset-0 rounded-xl"
+                                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", zIndex: -1 }} />
+                            )}
+                            <span className="relative font-semibold">{c}</span>
+                            {isActive && (
+                                <motion.span className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+                                    style={{ background: "#00FF9C", boxShadow: "0 0 6px #00FF9C" }}
+                                    animate={{ scale: [0.8, 1.4, 0.8], opacity: [0.7, 1, 0.7] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }} />
+                            )}
+                        </motion.button>
+                    );
+                })}
+            </div>
+        </LayoutGroup>
+    );
+}
+
+// ── Main Section ─────────────────────────────────────────────────────────────
+export default function ProjectsSection() {
+    const [filter, setFilter] = useState<Category>("All");
+    const [selected, setSelected] = useState<Project | null>(null);
+    const sectionRef = useRef(null);
+    const gridRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+    const featured = projects.filter((p) => p.featured);
+    const rest = filter === "All"
+        ? projects.filter((p) => !p.featured)
+        : projects.filter((p) => p.category === filter && !p.featured);
+
+    // On filter change: scroll up so animated cards fly in visibly from top
+    const handleFilterChange = useCallback((c: Category) => {
+        setFilter(c);
+        setTimeout(() => {
+            gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 60);
+    }, []);
+
+    return (
+        <section ref={sectionRef} id="projects" className="section relative py-32 overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="gradient-orb gradient-orb-purple w-[500px] h-[500px] -top-32 -right-32 absolute opacity-20" />
+                <div className="gradient-orb gradient-orb-green w-[400px] h-[400px] bottom-0 -left-32 absolute opacity-15" />
+            </div>
+            <div className="absolute inset-0 pointer-events-none" style={{
+                backgroundImage: "radial-gradient(circle at 2px 2px, rgba(0,255,156,0.06) 1px, transparent 0)",
+                backgroundSize: "40px 40px",
+            }} />
+
+            <div className="max-w-7xl mx-auto px-6 relative z-10">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-20"
+                >
+                    <motion.span className="text-neon-purple text-sm font-medium uppercase tracking-widest mb-4 block"
+                        animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
+                        My Work
+                    </motion.span>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
+                        Featured{" "}
+                        <span className="relative">
+                            <span className="text-gradient">Projects</span>
+                            <motion.span className="absolute -bottom-2 left-0 right-0 h-1 rounded-full"
+                                style={{ background: "linear-gradient(90deg, #00E5FF, #8B5CF6, #00FF9C)" }}
+                                initial={{ scaleX: 0 }}
+                                animate={isInView ? { scaleX: 1 } : {}}
+                                transition={{ delay: 0.5, duration: 0.8 }} />
+                        </span>
+                    </h2>
+                    <p className="text-foreground/50 max-w-xl mx-auto mt-4">
+                        A curated selection of projects that showcase my passion and skills.
+                    </p>
+                </motion.div>
+
+                {/* Featured */}
+                <div className="space-y-6 mb-20">
+                    {featured.slice(0, 2).map((p, i) => (
+                        <FeaturedProjectCard key={p.id} project={p} onClick={setSelected} reverse={i % 2 !== 0} />
+                    ))}
+                </div>
+
+                {/* Filter */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }}>
+                    <FilterTabs active={filter} onChange={handleFilterChange} />
+                </motion.div>
+
+                {/* Grid — ref for scroll-into-view */}
+                <div ref={gridRef} style={{ scrollMarginTop: "120px" }}>
+                    <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <AnimatePresence mode="popLayout">
+                            {rest.map((p, i) => (
+                                <ProjectCard key={p.id} project={p} index={i} onClick={setSelected} />
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
+                </div>
+            </div>
+
+            <AnimatePresence>
+                {selected && <ProjectModal project={selected} onClose={() => setSelected(null)} />}
+            </AnimatePresence>
+        </section>
     );
 }

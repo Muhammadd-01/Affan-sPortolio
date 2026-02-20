@@ -1,145 +1,74 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
-import { aboutContent } from "@/data/portfolio";
-import { Calendar, Sparkles, Target, Rocket, Heart, Code2 } from "lucide-react";
-
-// Animated counter
-function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
-    const [count, setCount] = useState(0);
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
-
-    useEffect(() => {
-        if (isInView) {
-            const duration = 2000;
-            const steps = 60;
-            const increment = value / steps;
-            let current = 0;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= value) {
-                    setCount(value);
-                    clearInterval(timer);
-                } else {
-                    setCount(Math.floor(current));
-                }
-            }, duration / steps);
-            return () => clearInterval(timer);
-        }
-    }, [isInView, value]);
-
-    return (
-        <span ref={ref} className="tabular-nums">
-            {count}{suffix}
-        </span>
-    );
-}
-
-// Animated icon wrapper
-function FloatingIcon({ icon: Icon, color, delay }: { icon: React.ElementType; color: string; delay: number }) {
-    return (
-        <motion.div
-            className={`p-3 rounded-xl ${color}`}
-            animate={{
-                y: [0, -8, 0],
-                rotate: [0, 5, -5, 0],
-            }}
-            transition={{
-                duration: 4,
-                repeat: Infinity,
-                delay,
-                ease: "easeInOut",
-            }}
-        >
-            <Icon className="w-6 h-6" />
-        </motion.div>
-    );
-}
-
-// Animated stat card
-function StatCard({
-    icon: Icon,
-    value,
-    label,
-    color,
-    index
-}: {
-    icon: React.ElementType;
-    value: string;
-    label: string;
-    color: string;
-    index: number;
-}) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: index * 0.1, duration: 0.5 }}
-            viewport={{ once: true }}
-            whileHover={{ y: -5, scale: 1.02 }}
-            className="glass rounded-2xl p-6 text-center relative overflow-hidden group"
-        >
-            {/* Background glow */}
-            <motion.div
-                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${color}`}
-                style={{ filter: "blur(40px)" }}
-            />
-
-            <motion.div
-                className="relative z-10"
-                whileHover={{ scale: 1.05 }}
-            >
-                <Icon className="w-8 h-8 mx-auto mb-3 text-neon-blue" />
-                <div className="text-3xl font-heading font-bold text-gradient mb-1">
-                    {value}
-                </div>
-                <div className="text-foreground/50 text-sm">{label}</div>
-            </motion.div>
-        </motion.div>
-    );
-}
+import { useRef, useEffect, useState } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { Code2, Rocket, Coffee, Award, ExternalLink, Sparkles } from "lucide-react";
 
 export default function AboutSection() {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
+    const sectionRef = useRef(null);
+    const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+    const [counters, setCounters] = useState({ projects: 0, experience: 0, clients: 0, coffee: 0 });
+
+    const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+    const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
+    useEffect(() => {
+        if (!isInView) return;
+        const targets = { projects: 15, experience: 3, clients: 20, coffee: 500 };
+        const steps = 60;
+        const duration = 2000;
+        (Object.keys(targets) as Array<keyof typeof targets>).forEach((key) => {
+            let cur = 0;
+            const inc = targets[key] / steps;
+            const timer = setInterval(() => {
+                cur += inc;
+                if (cur >= targets[key]) { cur = targets[key]; clearInterval(timer); }
+                setCounters((p) => ({ ...p, [key]: Math.floor(cur) }));
+            }, duration / steps);
+        });
+    }, [isInView]);
 
     const stats = [
-        { icon: Code2, value: "50+", label: "Projects Completed", color: "bg-neon-blue/20" },
-        { icon: Heart, value: "30+", label: "Happy Clients", color: "bg-neon-purple/20" },
-        { icon: Rocket, value: "4+", label: "Years Experience", color: "bg-neon-green/20" },
+        { icon: <Rocket className="w-6 h-6" />, value: counters.projects, label: "Projects Completed", color: "#00E5FF" },
+        { icon: <Code2 className="w-6 h-6" />, value: counters.experience, label: "Years Experience", color: "#8B5CF6" },
+        { icon: <Award className="w-6 h-6" />, value: counters.clients, label: "Happy Clients", color: "#00FF9C" },
+        { icon: <Coffee className="w-6 h-6" />, value: counters.coffee, label: "Cups of Coffee", color: "#FF006E" },
     ];
 
+    const highlightWords: Record<string, string> = {
+        "full-stack": "#00E5FF",
+        "React,": "#61DAFB",
+        "Laravel,": "#FF2D20",
+        "Node.js,": "#6DB33F",
+        ".NET,": "#512BD4",
+        "TailwindCSS,": "#06B6D4",
+        "NexoVate": "#00E5FF",
+        "Digital": "#00E5FF",
+    };
+
+    const renderText = (text: string) =>
+        text.split(" ").map((word, i) => {
+            const color = Object.entries(highlightWords).find(([k]) => word.includes(k))?.[1];
+            return (
+                <span key={i} style={color ? { color, fontWeight: 500 } : undefined}>
+                    {word}{" "}
+                </span>
+            );
+        });
+
     return (
-        <section
-            id="about"
-            ref={ref}
-            className="section relative py-32 overflow-hidden"
-        >
-            {/* Animated Background */}
-            <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-            >
-                <motion.div
-                    className="gradient-orb gradient-orb-purple w-[500px] h-[500px] -top-48 -right-48"
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        x: [0, -30, 0],
-                    }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                    className="gradient-orb gradient-orb-blue w-[400px] h-[400px] bottom-0 -left-32"
-                    animate={{
-                        scale: [1, 1.3, 1],
-                        y: [0, -40, 0],
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                />
+        <section ref={sectionRef} id="about" className="section relative py-32 overflow-hidden">
+            {/* Animated background */}
+            <motion.div className="absolute inset-0 pointer-events-none" style={{ y: backgroundY }}>
+                <div className="gradient-orb gradient-orb-blue w-[500px] h-[500px] top-0 -left-64 absolute opacity-20" />
+                <div className="gradient-orb gradient-orb-purple w-[400px] h-[400px] bottom-0 -right-32 absolute opacity-15" />
             </motion.div>
+
+            {/* Dot grid */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+                backgroundImage: "radial-gradient(circle at 2px 2px, rgba(139,92,246,0.08) 1px, transparent 0)",
+                backgroundSize: "40px 40px",
+            }} />
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 {/* Section Header */}
@@ -147,7 +76,7 @@ export default function AboutSection() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
+                    className="text-center mb-20"
                 >
                     <motion.span
                         className="text-neon-blue text-sm font-medium uppercase tracking-widest mb-4 block"
@@ -157,11 +86,12 @@ export default function AboutSection() {
                         Get to Know Me
                     </motion.span>
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4">
-                        About{" "}
+                        Who Am{" "}
                         <span className="relative">
-                            <span className="text-gradient">Me</span>
-                            <motion.div
-                                className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-neon-blue via-neon-purple to-neon-green rounded-full"
+                            <span className="text-gradient">I?</span>
+                            <motion.span
+                                className="absolute -bottom-2 left-0 right-0 h-1 rounded-full"
+                                style={{ background: "linear-gradient(90deg, #00E5FF, #8B5CF6, #00FF9C)" }}
                                 initial={{ scaleX: 0 }}
                                 animate={isInView ? { scaleX: 1 } : {}}
                                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -170,197 +100,153 @@ export default function AboutSection() {
                     </h2>
                 </motion.div>
 
-                {/* Main Content Grid */}
-                <div className="grid lg:grid-cols-2 gap-12 items-start mb-16">
-                    {/* Story & Mission Cards */}
+                <div className="grid lg:grid-cols-2 gap-16 items-start">
+                    {/* Left — Bio */}
                     <motion.div
-                        initial={{ opacity: 0, x: -50 }}
+                        initial={{ opacity: 0, x: -60 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ delay: 0.2, duration: 0.6 }}
+                        transition={{ duration: 0.7, delay: 0.2 }}
                         className="space-y-6"
                     >
-                        {/* Story Card */}
+                        {/* Sparkle badge */}
                         <motion.div
-                            className="glass rounded-2xl p-8 relative overflow-hidden group"
-                            whileHover={{ y: -5 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-neon-green/30"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                            transition={{ delay: 0.3 }}
                         >
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-br from-neon-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            />
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <FloatingIcon icon={Sparkles} color="bg-neon-blue/20 text-neon-blue" delay={0} />
-                                    <h3 className="text-xl font-heading font-semibold">My Story</h3>
-                                </div>
-                                <p className="text-foreground/70 leading-relaxed">
-                                    {aboutContent.story}
-                                </p>
-                            </div>
+                            <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
+                                <Sparkles className="w-4 h-4 text-neon-green" />
+                            </motion.span>
+                            <span className="text-sm text-neon-green">Full-Stack Developer & Creator</span>
                         </motion.div>
 
-                        {/* Mission Card */}
-                        <motion.div
-                            className="glass rounded-2xl p-8 relative overflow-hidden group"
-                            whileHover={{ y: -5 }}
-                        >
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-br from-neon-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            />
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <FloatingIcon icon={Target} color="bg-neon-purple/20 text-neon-purple" delay={0.5} />
-                                    <h3 className="text-xl font-heading font-semibold">My Mission</h3>
-                                </div>
-                                <p className="text-foreground/70 leading-relaxed">
-                                    {aboutContent.mission}
-                                </p>
-                            </div>
-                        </motion.div>
+                        {[
+                            "I'm Muhammad Affan — a full-stack web developer, content creator, and lifelong learner. I specialize in building modern, real-world web applications using React, Laravel, Node.js, .NET, and TailwindCSS, with a strong focus on clean UI/UX, performance, and scalability.",
+                            "Whether it's frontend magic or backend logic, I'm passionate about turning ideas into fully functional digital products. I believe in building with purpose — using clean code, thoughtful design, and scalable architecture.",
+                        ].map((para, i) => (
+                            <motion.p
+                                key={i}
+                                className="text-foreground/70 leading-relaxed text-lg"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: 0.35 + i * 0.12 }}
+                            >
+                                {renderText(para)}
+                            </motion.p>
+                        ))}
 
-                        {/* NexoVate Digital CEO Card */}
+                        {/* CEO Badge */}
                         <motion.a
                             href="https://nexovate-digital.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="glass rounded-2xl p-6 relative overflow-hidden group flex flex-col sm:flex-row items-center sm:items-start gap-6 cursor-pointer"
-                            whileHover={{ y: -5, scale: 1.02 }}
+                            className="group inline-flex items-center gap-4 px-6 py-4 rounded-2xl glass neon-border"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                            transition={{ delay: 0.6 }}
+                            whileHover={{ scale: 1.02 }}
                         >
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-br from-neon-green/10 to-neon-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            />
-
-                            {/* NexoVate Logo - Inline SVG for infinity symbol */}
-                            <div className="relative z-10 flex-shrink-0">
-                                <motion.div
-                                    className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 p-0.5 flex items-center justify-center"
-                                    whileHover={{ rotate: [0, -5, 5, 0] }}
-                                    transition={{ duration: 0.5 }}
-                                >
-                                    <div className="w-full h-full rounded-xl bg-background/90 flex items-center justify-center">
-                                        <svg viewBox="0 0 100 60" className="w-12 h-12 md:w-14 md:h-14">
-                                            <path
-                                                d="M25 30 C25 15, 50 15, 50 30 C50 45, 75 45, 75 30 C75 15, 50 15, 50 30 C50 45, 25 45, 25 30"
-                                                fill="none"
-                                                stroke="url(#nexoGrad)"
-                                                strokeWidth="8"
-                                                strokeLinecap="round"
-                                            />
-                                            <defs>
-                                                <linearGradient id="nexoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                    <stop offset="0%" stopColor="#3B82F6" />
-                                                    <stop offset="50%" stopColor="#06B6D4" />
-                                                    <stop offset="100%" stopColor="#22D3EE" />
-                                                </linearGradient>
-                                            </defs>
-                                        </svg>
-                                    </div>
-                                </motion.div>
+                            {/* Animated dot */}
+                            <div className="relative flex-shrink-0">
+                                <motion.span
+                                    className="w-3 h-3 rounded-full bg-neon-blue block"
+                                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                />
+                                <span className="absolute inset-0 w-3 h-3 rounded-full bg-neon-blue opacity-40 animate-ping" />
                             </div>
-
-                            <div className="relative z-10 flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Rocket className="w-4 h-4 text-neon-green" />
-                                    <span className="text-neon-green text-xs uppercase tracking-wider font-medium">Founder & CEO</span>
-                                </div>
-                                <h3 className="text-xl font-heading font-semibold group-hover:text-neon-blue transition-colors">
-                                    NexoVate Digital
-                                </h3>
-                                <p className="text-foreground/60 text-sm mt-1">
-                                    Leading a digital agency crafting innovative web & mobile solutions
-                                </p>
-                                <div className="flex items-center gap-2 mt-3 text-neon-blue/70 group-hover:text-neon-blue text-xs font-medium transition-colors">
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">Visit Website</span>
-                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </div>
+                            <div>
+                                <p className="text-foreground/50 text-xs uppercase tracking-widest mb-0.5">Currently</p>
+                                <p className="font-bold text-neon-blue">CEO at NexoVate Digital</p>
                             </div>
-
-                            {/* Arrow indicator */}
-                            <motion.div
-                                className="relative z-10 text-neon-blue/50 group-hover:text-neon-blue transition-colors"
-                                animate={{ x: [0, 5, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </motion.div>
+                            <ExternalLink className="w-4 h-4 text-neon-blue/60 group-hover:text-neon-blue transition-colors ml-auto" />
                         </motion.a>
+
+                        <motion.p
+                            className="text-foreground/70 leading-relaxed text-lg"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ delay: 0.7 }}
+                        >
+                            Outside tech, I study Islamic knowledge, psychology, and history — blending traditional wisdom with modern tools. Committed to growth, discipline, and creating solutions that matter.
+                        </motion.p>
                     </motion.div>
 
-                    {/* Timeline */}
+                    {/* Right — Stats */}
                     <motion.div
-                        initial={{ opacity: 0, x: 50 }}
+                        initial={{ opacity: 0, x: 60 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ delay: 0.3, duration: 0.6 }}
+                        transition={{ duration: 0.7, delay: 0.3 }}
+                        className="grid grid-cols-2 gap-5"
                     >
-                        <div className="flex items-center gap-3 mb-8">
-                            <FloatingIcon icon={Calendar} color="bg-neon-green/20 text-neon-green" delay={1} />
-                            <h3 className="text-xl font-heading font-semibold">My Journey</h3>
-                        </div>
-
-                        {/* Timeline Line */}
-                        <div className="relative">
+                        {stats.map((stat, i) => (
                             <motion.div
-                                className="absolute left-[19px] top-0 bottom-0 w-0.5"
-                                style={{
-                                    background: "linear-gradient(180deg, #00E5FF 0%, #8B5CF6 50%, #00FF9C 100%)",
-                                }}
-                                initial={{ height: 0 }}
-                                animate={isInView ? { height: "100%" } : {}}
-                                transition={{ delay: 0.5, duration: 1 }}
-                            />
+                                key={stat.label}
+                                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                                animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                                transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 120 }}
+                                whileHover={{ y: -6, scale: 1.03 }}
+                                className="relative group"
+                            >
+                                <div
+                                    className="relative p-6 rounded-2xl glass overflow-hidden border border-white/5 transition-all duration-300"
+                                    style={{
+                                        boxShadow: `0 0 0px ${stat.color}00`,
+                                        transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 30px ${stat.color}30`;
+                                        (e.currentTarget as HTMLDivElement).style.borderColor = `${stat.color}40`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                                        (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.05)";
+                                    }}
+                                >
+                                    {/* Radial glow */}
+                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                                        style={{ background: `radial-gradient(circle at 30% 30%, ${stat.color}12 0%, transparent 70%)` }} />
 
-                            <div className="space-y-6">
-                                {aboutContent.highlights.map((item, index) => (
-                                    <motion.div
-                                        key={item.year}
-                                        initial={{ opacity: 0, x: -30 }}
-                                        animate={isInView ? { opacity: 1, x: 0 } : {}}
-                                        transition={{ delay: index * 0.15 + 0.6, duration: 0.5 }}
-                                        className="relative pl-12 group"
+                                    {/* Icon */}
+                                    <div
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                                        style={{ background: `${stat.color}20`, color: stat.color }}
                                     >
-                                        {/* Dot */}
-                                        <motion.div
-                                            className="absolute left-0 top-2 w-10 h-10 rounded-full glass flex items-center justify-center border-2 border-neon-blue/50 group-hover:border-neon-blue transition-colors"
-                                            whileHover={{ scale: 1.2 }}
-                                        >
-                                            <motion.div
-                                                className="w-3 h-3 rounded-full bg-neon-blue"
-                                                animate={{ scale: [1, 1.2, 1] }}
-                                                transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
-                                            />
-                                        </motion.div>
+                                        {stat.icon}
+                                    </div>
 
-                                        {/* Content */}
-                                        <motion.div
-                                            className="glass rounded-xl p-5 group-hover:bg-glass-white transition-colors"
-                                            whileHover={{ x: 5 }}
-                                        >
-                                            <span className="text-neon-blue font-mono text-sm font-medium">
-                                                {item.year}
-                                            </span>
-                                            <h4 className="text-lg font-semibold mt-1 group-hover:text-neon-blue transition-colors">
-                                                {item.title}
-                                            </h4>
-                                            <p className="text-foreground/60 text-sm mt-1">
-                                                {item.description}
-                                            </p>
-                                        </motion.div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
+                                    {/* Counter */}
+                                    <div className="text-4xl font-heading font-bold text-foreground mb-1">
+                                        {stat.value}
+                                        <span style={{ color: stat.color }}>+</span>
+                                    </div>
+                                    <p className="text-foreground/50 text-sm">{stat.label}</p>
+                                </div>
+                            </motion.div>
+                        ))}
                     </motion.div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {stats.map((stat, index) => (
-                        <StatCard key={stat.label} {...stat} index={index} />
-                    ))}
-                </div>
+                {/* Bottom tagline */}
+                <motion.div
+                    className="text-center mt-24"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.9 }}
+                >
+                    <p className="text-xl text-foreground/40">
+                        Let&apos;s build something{" "}
+                        <motion.span
+                            className="text-neon-blue font-medium"
+                            animate={{ textShadow: ["0 0 10px #00E5FF", "0 0 25px #00E5FF", "0 0 10px #00E5FF"] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        >
+                            impactful
+                        </motion.span>{" "}
+                        together.
+                    </p>
+                </motion.div>
             </div>
         </section>
     );
