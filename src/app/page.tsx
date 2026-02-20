@@ -15,9 +15,6 @@ import FloatingButtons from "@/components/floating/WhatsAppButton";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 
 // Dynamic imports for client-only components
-const CustomCursor = dynamic(() => import("@/components/cursor/CustomCursor"), {
-    ssr: false,
-});
 
 const ThreeBackground = dynamic(() => import("@/components/three/ThreeBackground"), {
     ssr: false,
@@ -54,8 +51,6 @@ export default function Home() {
                         {/* Three.js Background - Fixed behind everything */}
                         <ThreeBackground />
 
-                        {/* Custom Cursor */}
-                        <CustomCursor />
 
                         {/* Navigation */}
                         <Navbar />

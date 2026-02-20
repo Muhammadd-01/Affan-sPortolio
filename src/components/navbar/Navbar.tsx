@@ -2,16 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Volume2, VolumeX } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { navLinks, personalInfo } from "@/data/portfolio";
-import { aiPitchScript } from "@/data/pitch";
 import { useActiveSection, useSmoothScroll } from "@/hooks/useNavigation";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const [isSpeaking, setIsSpeaking] = useState(false);
+
 
     const activeSection = useActiveSection(navLinks.map(link => link.href));
     const scrollTo = useSmoothScroll();
@@ -29,75 +28,6 @@ export default function Navbar() {
         setIsOpen(false);
     };
 
-    const handleAIPitch = () => {
-        if (isSpeaking) {
-            window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-            return;
-        }
-
-        if (!("speechSynthesis" in window)) {
-            console.error("Speech synthesis not supported");
-            return;
-        }
-
-        const startSpeaking = () => {
-            // Cancel any current speech for immediate start
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(aiPitchScript);
-
-            // Deep, realistic male voice settings
-            utterance.rate = 0.82;
-            utterance.pitch = 0.75;
-            utterance.volume = 1.0;
-
-            const voices = window.speechSynthesis.getVoices();
-
-            // Priority list for deep, realistic English voices
-            const preferredVoices = [
-                "Google UK English Male",
-                "Microsoft David",
-                "Microsoft James",
-                "en-GB",
-                "en-US",
-            ];
-
-            let selectedVoice = null;
-            for (const name of preferredVoices) {
-                selectedVoice = voices.find(v => v.name.includes(name) || v.lang.includes(name));
-                if (selectedVoice) break;
-            }
-
-            if (!selectedVoice) {
-                selectedVoice = voices.find(v => v.lang.startsWith("en"));
-            }
-
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-
-            utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = (event) => {
-                console.error("Speech synthesis error", event);
-                setIsSpeaking(false);
-            };
-
-            window.speechSynthesis.speak(utterance);
-        };
-
-        // On mobile/Chrome, voices might not be loaded yet
-        if (window.speechSynthesis.getVoices().length === 0) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                startSpeaking();
-                // Remove the listener once started
-                window.speechSynthesis.onvoiceschanged = null;
-            };
-        } else {
-            startSpeaking();
-        }
-    };
 
     return (
         <motion.nav
@@ -157,47 +87,15 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* AI Pitch Button + Mobile Menu */}
-                    <div className="flex items-center gap-3">
-                        <motion.button
-                            onClick={handleAIPitch}
-                            className={cn(
-                                "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
-                                isSpeaking
-                                    ? "bg-neon-purple text-white shadow-neon-purple"
-                                    : "border border-neon-blue/50 text-neon-blue hover:bg-neon-blue/10"
-                            )}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {isSpeaking ? (
-                                <>
-                                    <VolumeX className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Stop</span>
-                                    {/* Animated waves */}
-                                    <span className="absolute -right-1 -top-1">
-                                        <span className="absolute inline-flex h-3 w-3 rounded-full bg-neon-purple opacity-75 animate-ping" />
-                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-neon-purple" />
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <Volume2 className="w-4 h-4" />
-                                    <span className="hidden sm:inline">AI Pitch</span>
-                                </>
-                            )}
-                        </motion.button>
-
-                        {/* Mobile Menu Toggle */}
-                        <motion.button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="md:hidden p-2 rounded-lg hover:bg-glass-white"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                        </motion.button>
-                    </div>
+                    {/* Mobile Menu Toggle */}
+                    <motion.button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="md:hidden p-2 rounded-lg hover:bg-glass-white"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                    >
+                        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </motion.button>
                 </div>
 
                 {/* Mobile Menu */}
