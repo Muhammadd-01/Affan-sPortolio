@@ -11,10 +11,6 @@
   --neon-pink: #FF006E;
 }
 
-* {
-  cursor: none !important;
-}
-
 html {
   scroll-behavior: smooth;
 }
