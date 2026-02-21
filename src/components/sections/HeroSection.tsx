@@ -78,7 +78,7 @@ function FloatingCodeBlock() {
         { text: "const developer = {", color: "text-neon-purple" },
         { text: '  name: "Muhammad Affan",', color: "text-foreground/70" },
         { text: '  passion: "Creating",', color: "text-foreground/70" },
-        { text: '  skills: ["React", "Next.js", "TypeScript"],', color: "text-neon-blue" },
+        { text: '  skills: ["MERN", "Flutter", "TypeScript"],', color: "text-neon-blue" },
         { text: "};", color: "text-neon-purple" },
     ];
 
@@ -281,7 +281,7 @@ export default function HeroSection() {
                 >
                     <StatCard value="15+" label="Projects" delay={1.5} />
                     <StatCard value="3+" label="Years Exp" delay={1.7} />
-                    <StatCard value="20+" label="Happy Clients" delay={1.9} />
+                    <StatCard value="250+" label="Contributions" delay={1.9} />
                 </motion.div>
 
                 {/* CTA Buttons */}

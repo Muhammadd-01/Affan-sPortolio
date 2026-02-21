@@ -8,15 +8,18 @@ import {
     Phone,
     MapPin,
     Send,
+    Facebook,
     Github,
     Linkedin,
     Twitter,
     CheckCircle,
     Loader2,
     Sparkles,
+    Instagram,
     MessageSquare,
     ArrowRight,
 } from "lucide-react";
+import { SiUpwork, SiFreelancer, SiDiscord } from "react-icons/si";
 
 export default function ContactSection() {
     const ref = useRef(null);
@@ -50,6 +53,11 @@ export default function ContactSection() {
         { icon: Github, href: personalInfo.social.github, label: "GitHub", color: "#FFFFFF" },
         { icon: Linkedin, href: personalInfo.social.linkedin, label: "LinkedIn", color: "#0A66C2" },
         { icon: Twitter, href: personalInfo.social.twitter, label: "Twitter", color: "#1DA1F2" },
+        { icon: Instagram, href: personalInfo.social.instagram, label: "Instagram", color: "#E4405F" },
+        { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
+        { icon: SiUpwork, href: personalInfo.social.upwork, label: "Upwork", color: "#6FDA44" },
+        { icon: SiFreelancer, href: personalInfo.social.freelancer, label: "Freelancer", color: "#29B2FE" },
+        { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
     ];
 
     return (
@@ -139,11 +147,13 @@ export default function ContactSection() {
                             {[
                                 { icon: Mail, label: "Email", value: personalInfo.email, href: `mailto:${personalInfo.email}` },
                                 { icon: Phone, label: "Phone", value: personalInfo.phone, href: `tel:${personalInfo.phone}` },
-                                { icon: MapPin, label: "Location", value: personalInfo.location, href: null },
+                                { icon: MapPin, label: "Location", value: personalInfo.location, href: personalInfo.locationLink },
                             ].map((item, index) => (
                                 <motion.a
                                     key={item.label}
                                     href={item.href || undefined}
+                                    target={item.href ? "_blank" : undefined}
+                                    rel={item.href ? "noopener noreferrer" : undefined}
                                     initial={{ opacity: 0, x: -30 }}
                                     animate={isInView ? { opacity: 1, x: 0 } : {}}
                                     transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
@@ -185,30 +195,57 @@ export default function ContactSection() {
                                 <Sparkles className="w-4 h-4 text-neon-purple" />
                                 Connect with me
                             </p>
-                            <div className="flex gap-4">
-                                {socialLinks.map((social, index) => (
-                                    <motion.a
-                                        key={social.label}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-3 glass rounded-xl hover:bg-glass-white transition-all group"
-                                        whileHover={{
-                                            scale: 1.1,
-                                            y: -5,
-                                            boxShadow: `0 10px 30px ${social.color}30`,
-                                        }}
-                                        whileTap={{ scale: 0.9 }}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 + 0.7 }}
-                                    >
-                                        <social.icon
-                                            className="w-5 h-5 transition-colors"
-                                            style={{ color: social.color }}
-                                        />
-                                    </motion.a>
-                                ))}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex gap-4">
+                                    {socialLinks.slice(0, 4).map((social, index) => (
+                                        <motion.a
+                                            key={social.label}
+                                            href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="p-3 glass rounded-xl hover:bg-glass-white transition-all group"
+                                            whileHover={{
+                                                scale: 1.1,
+                                                y: -5,
+                                                boxShadow: `0 10px 30px ${social.color}30`,
+                                            }}
+                                            whileTap={{ scale: 0.9 }}
+                                            initial={{ opacity: 0, scale: 0 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: index * 0.1 + 0.7 }}
+                                        >
+                                            <social.icon
+                                                className="w-5 h-5 transition-colors"
+                                                style={{ color: social.color }}
+                                            />
+                                        </motion.a>
+                                    ))}
+                                </div>
+                                <div className="flex gap-4">
+                                    {socialLinks.slice(4).map((social, index) => (
+                                        <motion.a
+                                            key={social.label}
+                                            href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="p-3 glass rounded-xl hover:bg-glass-white transition-all group"
+                                            whileHover={{
+                                                scale: 1.1,
+                                                y: -5,
+                                                boxShadow: `0 10px 30px ${social.color}30`,
+                                            }}
+                                            whileTap={{ scale: 0.9 }}
+                                            initial={{ opacity: 0, scale: 0 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: index * 0.1 + 0.9 }}
+                                        >
+                                            <social.icon
+                                                className="w-5 h-5 transition-colors"
+                                                style={{ color: social.color }}
+                                            />
+                                        </motion.a>
+                                    ))}
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>

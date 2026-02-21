@@ -7,14 +7,14 @@ import { Code2, Rocket, Coffee, Award, ExternalLink, Sparkles } from "lucide-rea
 export default function AboutSection() {
     const sectionRef = useRef(null);
     const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-    const [counters, setCounters] = useState({ projects: 0, experience: 0, clients: 0, coffee: 0 });
+    const [counters, setCounters] = useState({ projects: 0, experience: 0, contributions: 0, coffee: 0 });
 
     const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
     const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
     useEffect(() => {
         if (!isInView) return;
-        const targets = { projects: 15, experience: 3, clients: 20, coffee: 500 };
+        const targets = { projects: 15, experience: 3, contributions: 250, coffee: 1000 };
         const steps = 60;
         const duration = 2000;
         (Object.keys(targets) as Array<keyof typeof targets>).forEach((key) => {
@@ -31,16 +31,16 @@ export default function AboutSection() {
     const stats = [
         { icon: <Rocket className="w-6 h-6" />, value: counters.projects, label: "Projects Completed", color: "#00E5FF" },
         { icon: <Code2 className="w-6 h-6" />, value: counters.experience, label: "Years Experience", color: "#8B5CF6" },
-        { icon: <Award className="w-6 h-6" />, value: counters.clients, label: "Happy Clients", color: "#00FF9C" },
+        { icon: <Award className="w-6 h-6" />, value: counters.contributions, label: "Code Contributions", color: "#00FF9C" },
         { icon: <Coffee className="w-6 h-6" />, value: counters.coffee, label: "Cups of Coffee", color: "#FF006E" },
     ];
 
     const highlightWords: Record<string, string> = {
         "full-stack": "#00E5FF",
         "React,": "#61DAFB",
-        "Laravel,": "#FF2D20",
         "Node.js,": "#6DB33F",
-        ".NET,": "#512BD4",
+        "Flutter,": "#02569B",
+        "MERN": "#00D8FF",
         "TailwindCSS,": "#06B6D4",
         "NexoVate": "#00E5FF",
         "Digital": "#00E5FF",
@@ -122,7 +122,7 @@ export default function AboutSection() {
                         </motion.div>
 
                         {[
-                            "I'm Muhammad Affan — a full-stack web developer, content creator, and lifelong learner. I specialize in building modern, real-world web applications using React, Laravel, Node.js, .NET, and TailwindCSS, with a strong focus on clean UI/UX, performance, and scalability.",
+                            "I'm Muhammad Affan — a full-stack web developer, content creator, and lifelong learner. I specialize in building modern, real-world applications using the MERN stack and Flutter, with a strong focus on clean UI/UX, performance, and scalability.",
                             "Whether it's frontend magic or backend logic, I'm passionate about turning ideas into fully functional digital products. I believe in building with purpose — using clean code, thoughtful design, and scalable architecture.",
                         ].map((para, i) => (
                             <motion.p

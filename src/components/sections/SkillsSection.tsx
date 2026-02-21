@@ -47,10 +47,10 @@ const skillCategories: Category[] = [
         color: "#8B5CF6",
         icon: Layers,
         skills: [
-            { name: "C#", level: 80, color: "#512BD4", iconUrl: `${D}/csharp/csharp-original.svg` },
-            { name: "ASP.NET Core", level: 75, color: "#512BD4", iconUrl: `${D}/dotnetcore/dotnetcore-original.svg` },
+            { name: "Node.js", level: 85, color: "#6DB33F", iconUrl: `${D}/nodejs/nodejs-original.svg` },
+            { name: "Express.js", level: 80, color: "#EDEDED", iconUrl: `${D}/express/express-original.svg` },
             { name: "PHP", level: 70, color: "#777BB4", iconUrl: `${D}/php/php-original.svg` },
-            { name: "Laravel", level: 80, color: "#FF2D20", iconUrl: `${D}/laravel/laravel-plain.svg` },
+            { name: "Firebase", level: 85, color: "#FFCA28", iconUrl: `${D}/firebase/firebase-plain.svg` },
         ],
     },
     {
@@ -58,10 +58,9 @@ const skillCategories: Category[] = [
         color: "#00FF9C",
         icon: Globe,
         skills: [
+            { name: "MERN Stack", level: 90, color: "#00FF9C", iconUrl: `${D}/mongodb/mongodb-original.svg` },
             { name: "Next.js", level: 85, color: "#EDEDED", iconUrl: `${D}/nextjs/nextjs-original.svg` },
-            { name: "Node.js", level: 80, color: "#6DB33F", iconUrl: `${D}/nodejs/nodejs-original.svg` },
-            { name: "MERN Stack", level: 85, color: "#00D8FF", iconUrl: `${D}/mongodb/mongodb-original.svg` },
-            { name: "Angular", level: 75, color: "#DD0031", iconUrl: `${D}/angularjs/angularjs-original.svg` },
+            { name: "TypeScript", level: 85, color: "#3178C6", iconUrl: `${D}/typescript/typescript-original.svg` },
         ],
     },
     {
@@ -76,21 +75,23 @@ const skillCategories: Category[] = [
         ],
     },
     {
-        category: "Database",
+        category: "Mobile",
         color: "#00E5FF",
-        icon: Database,
+        icon: Smartphone,
         skills: [
-            { name: "MySQL", level: 75, color: "#4479A1", iconUrl: `${D}/mysql/mysql-original.svg` },
-            { name: "SQL Server", level: 70, color: "#CC2927", iconUrl: `${D}/microsoftsqlserver/microsoftsqlserver-plain.svg` },
+            { name: "Flutter", level: 90, color: "#02569B", iconUrl: `${D}/flutter/flutter-original.svg` },
+            { name: "Dart", level: 85, color: "#0175C2", iconUrl: `${D}/dart/dart-original.svg` },
+            { name: "React Native", level: 75, color: "#61DAFB", iconUrl: `${D}/react/react-original.svg` },
         ],
     },
     {
-        category: "Mobile",
-        color: "#8B5CF6",
-        icon: Smartphone,
+        category: "Tools & DB",
+        color: "#FF006E",
+        icon: Layers,
         skills: [
-            { name: "Flutter", level: 70, color: "#02569B", iconUrl: `${D}/flutter/flutter-original.svg` },
-            { name: "Dart", level: 70, color: "#0175C2", iconUrl: `${D}/dart/dart-original.svg` },
+            { name: "Git / GitHub", level: 90, color: "#F05032", iconUrl: `${D}/git/git-original.svg` },
+            { name: "MySQL / SQL", level: 80, color: "#4479A1", iconUrl: `${D}/mysql/mysql-original.svg` },
+            { name: "Docker / AWS", level: 65, color: "#2496ED", iconUrl: `${D}/docker/docker-original.svg` },
         ],
     },
 ];
@@ -257,8 +258,8 @@ export default function SkillsSection() {
                                         style={{ background: cat.color }}
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
                                 )}
-                                <Icon size={14} style={{ position: "relative", zIndex: 1 }} />
-                                <span style={{ position: "relative", zIndex: 1 }}>{cat.category}</span>
+                                <Icon size={14} style={{ position: "relative", zIndex: 10 }} />
+                                <span style={{ position: "relative", zIndex: 10 }}>{cat.category}</span>
                             </motion.button>
                         );
                     })}

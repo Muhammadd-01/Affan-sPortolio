@@ -7,6 +7,7 @@ import {
     Github,
     Linkedin,
     Twitter,
+    Facebook,
     Mail,
     Phone,
     MapPin,
@@ -16,7 +17,11 @@ import {
     Sparkles,
     ExternalLink,
     ArrowUpRight,
+    GraduationCap,
+    Award,
+    Instagram,
 } from "lucide-react";
+import { SiUpwork, SiFreelancer, SiDiscord } from "react-icons/si";
 
 // Navigation links
 const quickLinks = [
@@ -46,6 +51,11 @@ export default function Footer() {
         { icon: Github, href: personalInfo.social.github, label: "GitHub", color: "#FFFFFF" },
         { icon: Linkedin, href: personalInfo.social.linkedin, label: "LinkedIn", color: "#0A66C2" },
         { icon: Twitter, href: personalInfo.social.twitter, label: "Twitter", color: "#1DA1F2" },
+        { icon: Instagram, href: personalInfo.social.instagram, label: "Instagram", color: "#E4405F" },
+        { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
+        { icon: SiUpwork, href: personalInfo.social.upwork, label: "Upwork", color: "#6FDA44" },
+        { icon: SiFreelancer, href: personalInfo.social.freelancer, label: "Freelancer", color: "#29B2FE" },
+        { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
     ];
 
     return (
@@ -82,30 +92,57 @@ export default function Footer() {
                         </p>
 
                         {/* Social Links */}
-                        <div className="flex gap-3">
-                            {socialLinks.map((social, index) => (
-                                <motion.a
-                                    key={social.label}
-                                    href={social.href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-2.5 rounded-lg glass hover:bg-glass-white transition-all group"
-                                    initial={{ opacity: 0, scale: 0 }}
-                                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                                    transition={{ delay: index * 0.1 + 0.2 }}
-                                    whileHover={{
-                                        scale: 1.1,
-                                        y: -3,
-                                        boxShadow: `0 10px 30px ${social.color}30`,
-                                    }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <social.icon
-                                        className="w-5 h-5 transition-colors"
-                                        style={{ color: social.color }}
-                                    />
-                                </motion.a>
-                            ))}
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-3">
+                                {socialLinks.slice(0, 4).map((social, index) => (
+                                    <motion.a
+                                        key={social.label}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2.5 rounded-lg glass hover:bg-glass-white transition-all group"
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                                        transition={{ delay: index * 0.1 + 0.2 }}
+                                        whileHover={{
+                                            scale: 1.1,
+                                            y: -3,
+                                            boxShadow: `0 10px 30px ${social.color}30`,
+                                        }}
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        <social.icon
+                                            className="w-5 h-5 transition-colors"
+                                            style={{ color: social.color }}
+                                        />
+                                    </motion.a>
+                                ))}
+                            </div>
+                            <div className="flex gap-3">
+                                {socialLinks.slice(4).map((social, index) => (
+                                    <motion.a
+                                        key={social.label}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2.5 rounded-lg glass hover:bg-glass-white transition-all group"
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                                        transition={{ delay: index * 0.1 + 0.4 }}
+                                        whileHover={{
+                                            scale: 1.1,
+                                            y: -3,
+                                            boxShadow: `0 10px 30px ${social.color}30`,
+                                        }}
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        <social.icon
+                                            className="w-5 h-5 transition-colors"
+                                            style={{ color: social.color }}
+                                        />
+                                    </motion.a>
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
 
@@ -177,6 +214,8 @@ export default function Footer() {
                             <li>
                                 <a
                                     href={`mailto:${personalInfo.email}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="text-foreground/60 hover:text-neon-blue transition-colors text-sm flex items-center gap-3 group"
                                 >
                                     <div className="p-2 rounded-lg bg-glass-white group-hover:bg-neon-blue/20 transition-colors">
@@ -196,11 +235,18 @@ export default function Footer() {
                                     {personalInfo.phone}
                                 </a>
                             </li>
-                            <li className="text-foreground/60 text-sm flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-glass-white">
-                                    <MapPin className="w-4 h-4 text-neon-green" />
-                                </div>
-                                {personalInfo.location}
+                            <li>
+                                <a
+                                    href={personalInfo.locationLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-foreground/60 hover:text-neon-green transition-colors text-sm flex items-center gap-3 group"
+                                >
+                                    <div className="p-2 rounded-lg bg-glass-white group-hover:bg-neon-green/20 transition-colors">
+                                        <MapPin className="w-4 h-4 text-neon-green" />
+                                    </div>
+                                    {personalInfo.location}
+                                </a>
                             </li>
                         </ul>
                     </motion.div>
@@ -214,10 +260,10 @@ export default function Footer() {
                     className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 mb-8 border-y border-glass-border"
                 >
                     {[
-                        { label: "Projects Completed", value: "50+", icon: Code },
-                        { label: "Happy Clients", value: "30+", icon: Heart },
-                        { label: "Years Experience", value: "4+", icon: Sparkles },
-                        { label: "Cups of Coffee", value: "∞", icon: Coffee },
+                        { label: "Projects Completed", value: "15+", icon: Code },
+                        { label: "Code Contributions", value: "250+", icon: Sparkles },
+                        { label: "Years Experience", value: "3+", icon: GraduationCap },
+                        { label: "Cups of Coffee", value: "1000+", icon: Coffee },
                     ].map((stat, index) => (
                         <motion.div
                             key={stat.label}

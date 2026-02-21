@@ -25,7 +25,9 @@ export default function Navbar() {
 
     const handleNavClick = (href: string) => {
         scrollTo(href);
-        setIsOpen(false);
+        setTimeout(() => {
+            setIsOpen(false);
+        }, 300);
     };
 
 
