@@ -19,7 +19,7 @@ import {
     MessageSquare,
     ArrowRight,
 } from "lucide-react";
-import { SiUpwork, SiFreelancer, SiDiscord } from "react-icons/si";
+
 
 export default function ContactSection() {
     const ref = useRef(null);
@@ -55,9 +55,6 @@ export default function ContactSection() {
         { icon: Twitter, href: personalInfo.social.twitter, label: "Twitter", color: "#1DA1F2" },
         { icon: Instagram, href: personalInfo.social.instagram, label: "Instagram", color: "#E4405F" },
         { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
-        { icon: SiUpwork, href: personalInfo.social.upwork, label: "Upwork", color: "#6FDA44" },
-        { icon: SiFreelancer, href: personalInfo.social.freelancer, label: "Freelancer", color: "#29B2FE" },
-        { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
     ];
 
     return (

@@ -19,8 +19,8 @@ export const personalInfo = {
     title: "Full-Stack Developer & Creative Technologist",
     tagline: "Crafting Digital Experiences That Push Boundaries",
     email: "affan.work05@gmail.com",
-    phone: "+923128538773",
-    whatsapp: "+923128538773",
+    phone: "+923160212457",
+    whatsapp: "+923160212457",
     location: "Karachi",
     locationLink: "https://maps.app.goo.gl/m8i4Q3SGi5gECHA9A",
     resumeUrl: "/resume.pdf",
@@ -30,9 +30,6 @@ export const personalInfo = {
         twitter: "https://x.com/affann_23",
         instagram: "https://www.instagram.com/affann_.12/?__pwa=1",
         facebook: "https://www.facebook.com/muhammad.affan.641514/",
-        upwork: "https://upwork.com/freelancers/affan",
-        freelancer: "https://freelancer.com/u/affan",
-        discord: "https://discord.gg/affan",
     },
 };
 
