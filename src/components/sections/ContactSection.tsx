@@ -17,11 +17,7 @@ import {
     MessageSquare,
     ArrowRight,
 } from "lucide-react";
-<<<<<<< HEAD
-
-=======
 import { SiDiscord, SiX } from "react-icons/si";
->>>>>>> d28d44b (My Portfolio)
 
 export default function ContactSection() {
     const ref = useRef(null);
@@ -56,10 +52,7 @@ export default function ContactSection() {
         { icon: Linkedin, href: personalInfo.social.linkedin, label: "LinkedIn", color: "#0A66C2" },
         { icon: SiX, href: personalInfo.social.twitter, label: "X (Twitter)", color: "#FFFFFF" },
         { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
-<<<<<<< HEAD
-=======
         { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
->>>>>>> d28d44b (My Portfolio)
     ];
 
     return (
