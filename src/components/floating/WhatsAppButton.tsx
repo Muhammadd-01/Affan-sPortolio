@@ -39,60 +39,7 @@ export default function FloatingButtons() {
 
     return (
         <div className="fixed right-6 bottom-6 z-50 flex flex-col gap-4">
-            {/* Go to Top Button */}
-            <AnimatePresence>
-                {showGoTop && (
-                    <motion.button
-                        initial={{ opacity: 0, scale: 0, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0, y: 20 }}
-                        whileHover={{ scale: 1.1, y: -2 }}
-                        whileTap={{ scale: 0.9 }}
-                        onMouseEnter={() => setIsHoveringTop(true)}
-                        onMouseLeave={() => setIsHoveringTop(false)}
-                        onClick={scrollToTop}
-                        className="relative p-4 rounded-full bg-gradient-to-br from-neon-blue to-neon-purple shadow-lg"
-                        style={{
-                            boxShadow: isHoveringTop
-                                ? "0 0 30px rgba(0, 229, 255, 0.6), 0 0 60px rgba(139, 92, 246, 0.4)"
-                                : "0 10px 30px rgba(0, 0, 0, 0.3)",
-                        }}
-                    >
-                        {/* Pulse ring */}
-                        <motion.div
-                            className="absolute inset-0 rounded-full border-2 border-neon-blue"
-                            animate={{
-                                scale: [1, 1.3, 1],
-                                opacity: [0.5, 0, 0.5],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        />
-
-                        <motion.div
-                            animate={{ y: isHoveringTop ? [-2, 2, -2] : 0 }}
-                            transition={{ duration: 0.5, repeat: isHoveringTop ? Infinity : 0 }}
-                        >
-                            <ArrowUp className="w-5 h-5 text-white" />
-                        </motion.div>
-
-                        {/* Tooltip */}
-                        <AnimatePresence>
-                            {isHoveringTop && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 10 }}
-                                    className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-background/90 border border-glass-border text-sm whitespace-nowrap"
-                                >
-                                    Back to Top
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.button>
-                )}
-            </AnimatePresence>
-
-            {/* WhatsApp Button */}
+            {/* WhatsApp Button - Now Above */}
             <motion.a
                 href={whatsappUrl}
                 target="_blank"
@@ -104,7 +51,7 @@ export default function FloatingButtons() {
                 whileTap={{ scale: 0.9 }}
                 onMouseEnter={() => setIsHoveringWhatsApp(true)}
                 onMouseLeave={() => setIsHoveringWhatsApp(false)}
-                className="relative p-4 rounded-full bg-[#25D366]"
+                className="relative p-4 rounded-full bg-[#25D366] order-1"
                 style={{
                     boxShadow: isHoveringWhatsApp
                         ? "0 0 30px rgba(37, 211, 102, 0.6), 0 0 60px rgba(37, 211, 102, 0.4)"
@@ -154,6 +101,59 @@ export default function FloatingButtons() {
                     )}
                 </AnimatePresence>
             </motion.a>
+
+            {/* Go to Top Button - Now Below */}
+            <AnimatePresence>
+                {showGoTop && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0, y: 20 }}
+                        whileHover={{ scale: 1.1, y: -2 }}
+                        whileTap={{ scale: 0.9 }}
+                        onMouseEnter={() => setIsHoveringTop(true)}
+                        onMouseLeave={() => setIsHoveringTop(false)}
+                        onClick={scrollToTop}
+                        className="relative p-4 rounded-full bg-gradient-to-br from-neon-blue to-neon-purple shadow-lg order-2"
+                        style={{
+                            boxShadow: isHoveringTop
+                                ? "0 0 30px rgba(0, 229, 255, 0.6), 0 0 60px rgba(139, 92, 246, 0.4)"
+                                : "0 10px 30px rgba(0, 0, 0, 0.3)",
+                        }}
+                    >
+                        {/* Pulse ring */}
+                        <motion.div
+                            className="absolute inset-0 rounded-full border-2 border-neon-blue"
+                            animate={{
+                                scale: [1, 1.3, 1],
+                                opacity: [0.5, 0, 0.5],
+                            }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        />
+
+                        <motion.div
+                            animate={{ y: isHoveringTop ? [-2, 2, -2] : 0 }}
+                            transition={{ duration: 0.5, repeat: isHoveringTop ? Infinity : 0 }}
+                        >
+                            <ArrowUp className="w-5 h-5 text-white" />
+                        </motion.div>
+
+                        {/* Tooltip */}
+                        <AnimatePresence>
+                            {isHoveringTop && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-background/90 border border-glass-border text-sm whitespace-nowrap"
+                                >
+                                    Back to Top
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

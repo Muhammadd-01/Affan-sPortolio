@@ -11,15 +11,17 @@ import {
     Facebook,
     Github,
     Linkedin,
-    Twitter,
     CheckCircle,
     Loader2,
     Sparkles,
-    Instagram,
     MessageSquare,
     ArrowRight,
 } from "lucide-react";
+<<<<<<< HEAD
 
+=======
+import { SiDiscord, SiX } from "react-icons/si";
+>>>>>>> d28d44b (My Portfolio)
 
 export default function ContactSection() {
     const ref = useRef(null);
@@ -52,9 +54,12 @@ export default function ContactSection() {
     const socialLinks = [
         { icon: Github, href: personalInfo.social.github, label: "GitHub", color: "#FFFFFF" },
         { icon: Linkedin, href: personalInfo.social.linkedin, label: "LinkedIn", color: "#0A66C2" },
-        { icon: Twitter, href: personalInfo.social.twitter, label: "Twitter", color: "#1DA1F2" },
-        { icon: Instagram, href: personalInfo.social.instagram, label: "Instagram", color: "#E4405F" },
+        { icon: SiX, href: personalInfo.social.twitter, label: "X (Twitter)", color: "#FFFFFF" },
         { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
+<<<<<<< HEAD
+=======
+        { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
+>>>>>>> d28d44b (My Portfolio)
     ];
 
     return (

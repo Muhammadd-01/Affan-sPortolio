@@ -28,8 +28,11 @@ export const personalInfo = {
         github: "https://github.com/Muhammadd-01",
         linkedin: "https://www.linkedin.com/in/muhammad-affan-8ab604280/",
         twitter: "https://x.com/affann_23",
-        instagram: "https://www.instagram.com/affann_.12/?__pwa=1",
         facebook: "https://www.facebook.com/muhammad.affan.641514/",
+<<<<<<< HEAD
+=======
+        discord: "https://discord.gg/affan",
+>>>>>>> d28d44b (My Portfolio)
     },
 };
 

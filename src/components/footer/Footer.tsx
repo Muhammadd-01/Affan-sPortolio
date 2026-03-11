@@ -6,7 +6,6 @@ import { personalInfo } from "@/data/portfolio";
 import {
     Github,
     Linkedin,
-    Twitter,
     Facebook,
     Mail,
     Phone,
@@ -19,9 +18,12 @@ import {
     ArrowUpRight,
     GraduationCap,
     Award,
-    Instagram,
 } from "lucide-react";
+<<<<<<< HEAD
 
+=======
+import { SiDiscord, SiX } from "react-icons/si";
+>>>>>>> d28d44b (My Portfolio)
 
 // Navigation links
 const quickLinks = [
@@ -45,14 +47,17 @@ const services = [
 
 export default function Footer() {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-50px" });
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     const socialLinks = [
         { icon: Github, href: personalInfo.social.github, label: "GitHub", color: "#FFFFFF" },
         { icon: Linkedin, href: personalInfo.social.linkedin, label: "LinkedIn", color: "#0A66C2" },
-        { icon: Twitter, href: personalInfo.social.twitter, label: "Twitter", color: "#1DA1F2" },
-        { icon: Instagram, href: personalInfo.social.instagram, label: "Instagram", color: "#E4405F" },
+        { icon: SiX, href: personalInfo.social.twitter, label: "X (Twitter)", color: "#FFFFFF" },
         { icon: Facebook, href: personalInfo.social.facebook, label: "Facebook", color: "#1877F2" },
+<<<<<<< HEAD
+=======
+        { icon: SiDiscord, href: personalInfo.social.discord, label: "Discord", color: "#5865F2" },
+>>>>>>> d28d44b (My Portfolio)
     ];
 
     return (
@@ -285,26 +290,21 @@ export default function Footer() {
                     className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-foreground/40"
                 >
                     <div className="flex items-center gap-2">
-                        <span>Designed & Built with</span>
-                        <motion.span
-                            className="text-neon-purple"
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                        >
-                            ♥
-                        </motion.span>
-                        <span>by</span>
-                        <span className="text-gradient font-medium">{personalInfo.name}</span>
+                        <Code className="w-4 h-4 text-neon-blue" />
+                        <span>Architected with Excellence by</span>
+                        <span className="text-gradient font-black tracking-wide uppercase">{personalInfo.name}</span>
+                        <span className="hidden md:inline ml-2 text-glass-border">|</span>
+                        <span className="hidden md:inline text-[10px] uppercase tracking-tighter opacity-50 font-mono">ALL SYSTEMS OPERATIONAL</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span>© {new Date().getFullYear()} All Rights Reserved</span>
+                        <span>© {new Date().getFullYear()} Precision Engineering</span>
                         <span className="hidden md:inline text-glass-border">|</span>
                         <motion.a
-                            href="#"
-                            className="hover:text-neon-blue transition-colors"
+                            href="/privacy"
+                            className="hover:text-neon-blue transition-colors underline-offset-4 hover:underline"
                             whileHover={{ x: 2 }}
                         >
-                            Privacy Policy
+                            Privacy & Terms
                         </motion.a>
                     </div>
                 </motion.div>
