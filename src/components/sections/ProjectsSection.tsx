@@ -6,6 +6,7 @@ import { FaGithub } from "react-icons/fa";
 import { HiExternalLink, HiX } from "react-icons/hi";
 import { Star, ArrowRight, Code, Smartphone, Globe } from "lucide-react";
 import { projects as portfolioProjects, techColorMap } from "@/data/portfolio";
+import TiltCard from "@/components/ui/TiltCard";
 
 const projects = portfolioProjects.map(p => ({
     ...p,
@@ -72,51 +73,31 @@ const ImageCarousel = ({ images, isHovered, title, category }: { images: string[
     );
 };
 
-// ProjectCard with forwardRef for AnimatePresence compatibility
 const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [imageError, setImageError] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const el = cardRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        setMousePosition({
-            x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
-            y: ((e.clientY - rect.top) / rect.height - 0.5) * 20,
-        });
-    };
 
     return (
         <motion.div
-            ref={ref || cardRef}
+            ref={ref}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
             onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => {
-                setIsHovered(false);
-                setMousePosition({ x: 0, y: 0 });
-            }}
-            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={() => onClick(project)}
-            className="relative group cursor-pointer"
-            style={{ perspective: "1000px" }}
+            className="h-full"
             layout
             {...props}
         >
+            <TiltCard className="h-full">
             <motion.div
-                className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10"
+                className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 group cursor-pointer"
                 animate={{
-                    rotateX: -mousePosition.y * 0.5,
-                    rotateY: mousePosition.x * 0.5,
                     scale: isHovered ? 1.02 : 1,
                 }}
                 transition={{ duration: 0.1 }}
-                style={{ transformStyle: "preserve-3d" }}
             >
                 {/* Featured badge */}
                 {project.featured && (
@@ -219,14 +200,8 @@ const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref)
                     </div>
                 </div>
 
-                {/* 3D effect border glow */}
-                <motion.div
-                    className="absolute inset-0 rounded-3xl pointer-events-none"
-                    style={{
-                        background: `radial-gradient(circle at ${50 + mousePosition.x}% ${50 + mousePosition.y}%, rgba(0, 255, 255, 0.15), transparent 50%)`,
-                    }}
-                />
             </motion.div>
+            </TiltCard>
         </motion.div>
     );
 });
@@ -247,9 +222,10 @@ const FeaturedProject = ({ project, onClick }: any) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => onClick(project)}
-            className="lg:col-span-1 relative group cursor-pointer"
+            className="lg:col-span-1 relative group cursor-pointer h-full"
         >
-            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-pink-500/10 border border-cyan-500/20">
+            <TiltCard className="h-full">
+            <div className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-pink-500/10 border border-cyan-500/20">
                 <div className="grid md:grid-cols-2 gap-6 p-6">
                     {/* Image */}
                     <div className="relative h-64 md:h-full rounded-2xl overflow-hidden">
@@ -315,6 +291,7 @@ const FeaturedProject = ({ project, onClick }: any) => {
                     </div>
                 </div>
             </div>
+            </TiltCard>
         </motion.div>
     );
 };

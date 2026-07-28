@@ -10,6 +10,7 @@ import {
     Calendar,
     ExternalLink,
 } from "lucide-react";
+import TiltCard from "@/components/ui/TiltCard";
 
 interface Experience {
     title: string;
@@ -123,7 +124,8 @@ export default function ExperienceSection() {
 
                                     {/* Content Card */}
                                     <div className={`ml-16 md:ml-0 md:w-1/2 ${isEven ? "md:pr-16" : "md:pl-16"}`}>
-                                        <div className="glass rounded-2xl p-6 hover:bg-glass-white transition-all duration-300 group">
+                                        <TiltCard>
+                                            <div className="glass rounded-2xl p-6 hover:bg-glass-white transition-all duration-300 group h-full">
                                             <div className="flex items-start gap-4">
                                                 <div className={`p-3 rounded-xl bg-${color}/20 shrink-0`}>
                                                     <Icon className={`w-6 h-6 text-${color}`} />
@@ -158,7 +160,8 @@ export default function ExperienceSection() {
                                                     </ul>
                                                 </div>
                                             </div>
-                                        </div>
+                                            </div>
+                                        </TiltCard>
                                     </div>
                                 </motion.div>
                             );

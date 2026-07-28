@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { Code2, Rocket, Coffee, Award, ExternalLink, Sparkles } from "lucide-react";
+import TiltCard from "@/components/ui/TiltCard";
 
 export default function AboutSection() {
     const sectionRef = useRef(null);
@@ -189,8 +190,9 @@ export default function AboutSection() {
                                 whileHover={{ y: -6, scale: 1.03 }}
                                 className="relative group"
                             >
+                                <TiltCard>
                                 <div
-                                    className="relative p-6 rounded-2xl glass overflow-hidden border border-white/5 transition-all duration-300"
+                                    className="relative p-6 rounded-2xl glass overflow-hidden border border-white/5 transition-all duration-300 h-full"
                                     style={{
                                         boxShadow: `0 0 0px ${stat.color}00`,
                                         transition: "box-shadow 0.3s ease, border-color 0.3s ease",
@@ -223,6 +225,7 @@ export default function AboutSection() {
                                     </div>
                                     <p className="text-foreground/50 text-sm">{stat.label}</p>
                                 </div>
+                                </TiltCard>
                             </motion.div>
                         ))}
                     </motion.div>

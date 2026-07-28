@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { GraduationCap, Globe, Download, Eye, Calendar, MapPin, Sparkles } from "lucide-react";
 import MagneticButton from "./MagneticButton";
+import TiltCard from "@/components/ui/TiltCard";
 
 const education = [
     {
@@ -110,8 +111,9 @@ export default function ResumeSection() {
                                         animate={{ scale: [1, 2.5], opacity: [0.3, 0] }}
                                         transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }} />
 
-                                    <motion.div className="glass rounded-2xl p-5 border border-white/5 overflow-hidden relative"
-                                        whileHover={{ borderColor: `${edu.color}50`, boxShadow: `0 0 30px ${edu.color}20`, x: 6 }}
+                                    <TiltCard>
+                                    <motion.div className="glass rounded-2xl p-5 border border-white/5 overflow-hidden relative h-full"
+                                        whileHover={{ borderColor: `${edu.color}50`, boxShadow: `0 0 30px ${edu.color}20` }}
                                         transition={{ duration: 0.3 }}>
                                         <div className="absolute top-0 right-0 w-20 h-20 opacity-10 pointer-events-none"
                                             style={{ background: `radial-gradient(circle, ${edu.color} 0%, transparent 70%)` }} />
@@ -124,6 +126,7 @@ export default function ResumeSection() {
                                         </div>
                                         <p className="text-foreground/50 text-sm">{edu.description}</p>
                                     </motion.div>
+                                    </TiltCard>
                                 </motion.div>
                             ))}
                         </div>
@@ -145,9 +148,21 @@ export default function ResumeSection() {
                                 {languages.map((lang, i) => (
                                     <motion.div key={i}
                                         initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ delay: 0.4 + i * 0.1 }}
-                                        className="glass rounded-2xl p-5 border border-white/5"
-                                        whileHover={{ borderColor: `${lang.color}50`, boxShadow: `0 0 25px ${lang.color}15` }}>
+                                        transition={{ delay: 0.4 + i * 0.1 }}>
+                                        <TiltCard>
+                                        <div
+                                            className="glass rounded-2xl p-5 border border-white/5 h-full transition-all duration-300"
+                                            style={{
+                                                boxShadow: "none",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 25px ${lang.color}15`;
+                                                (e.currentTarget as HTMLDivElement).style.borderColor = `${lang.color}50`;
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                                                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.05)";
+                                            }}>
                                         <div className="flex justify-between items-center mb-3">
                                             <h4 className="font-bold text-foreground">{lang.name}</h4>
                                             <span className="text-sm font-medium px-3 py-1 rounded-full"
@@ -171,6 +186,8 @@ export default function ResumeSection() {
                                             initial={{ width: 0 }}
                                             animate={isInView ? { width: `${lang.percentage}%` } : {}}
                                             transition={{ duration: 1.2, delay: 0.6 + i * 0.1 }} />
+                                        </div>
+                                        </TiltCard>
                                     </motion.div>
                                 ))}
                             </div>
@@ -178,8 +195,9 @@ export default function ResumeSection() {
 
                         {/* Resume Card */}
                         <motion.div initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : {}}
-                            transition={{ delay: 0.6 }}
-                            className="relative glass rounded-3xl p-8 border neon-border text-center overflow-hidden">
+                            transition={{ delay: 0.6 }}>
+                            <TiltCard>
+                            <div className="relative glass rounded-3xl p-8 border neon-border text-center overflow-hidden h-full">
                             <motion.div className="absolute inset-0 pointer-events-none"
                                 animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 3, repeat: Infinity }}
                                 style={{ background: "radial-gradient(circle at 50% 50%, rgba(0,229,255,0.08) 0%, transparent 70%)" }} />
@@ -257,6 +275,8 @@ export default function ResumeSection() {
                                     </motion.a>
                                 </MagneticButton>
                             </div>
+                            </div>
+                            </TiltCard>
                         </motion.div>
                     </div>
                 </div>
