@@ -22,40 +22,16 @@ interface Experience {
 
 const experiences: Experience[] = [
     {
-        title: "Senior Full-Stack Developer",
-        company: "Tech Innovations Inc.",
-        location: "Remote",
-        period: "2023 - Present",
+        title: "Teacher Assistant",
+        company: "Aptech Metro Star Gate",
+        location: "Karachi",
+        period: "April 2024 - Present",
         description: [
-            "Leading development of enterprise-scale applications",
-            "Mentoring junior developers and conducting code reviews",
-            "Implementing CI/CD pipelines and DevOps best practices",
+            "Assisting students with programming concepts, logic building, and debugging.",
+            "Conducting practical lab sessions and guiding students in web and software development projects.",
+            "Evaluating assignments and helping to maintain a collaborative learning environment.",
         ],
         type: "work",
-    },
-    {
-        title: "Full-Stack Developer",
-        company: "Digital Solutions Co.",
-        location: "San Francisco, CA",
-        period: "2021 - 2023",
-        description: [
-            "Built and maintained multiple React/Next.js applications",
-            "Integrated third-party APIs and payment systems",
-            "Improved application performance by 40%",
-        ],
-        type: "work",
-    },
-    {
-        title: "Computer Science Degree",
-        company: "University of Technology",
-        location: "New York, NY",
-        period: "2017 - 2021",
-        description: [
-            "Bachelor of Science in Computer Science",
-            "Specialized in Software Engineering and AI",
-            "Dean's List - All semesters",
-        ],
-        type: "education",
     },
 ];
 

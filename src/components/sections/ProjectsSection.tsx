@@ -36,6 +36,42 @@ const ProjectPlaceholder = ({ title, category }: { title: string; category: stri
     );
 };
 
+// ImageCarousel component
+const ImageCarousel = ({ images, isHovered, title, category }: { images: string[], isHovered?: boolean, title: string, category: string }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [imageError, setImageError] = useState(false);
+
+    useEffect(() => {
+        if (!images || images.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % images.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [images]);
+
+    const currentImage = images && images.length > 0 ? images[currentIndex] : "";
+
+    if (imageError || !currentImage) {
+        return <ProjectPlaceholder title={title} category={category} />;
+    }
+
+    return (
+        <AnimatePresence mode="wait">
+            <motion.img
+                key={currentIndex}
+                src={currentImage}
+                alt={`${title} image ${currentIndex + 1}`}
+                className="w-full h-full object-cover absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, scale: isHovered ? 1.1 : 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                onError={() => setImageError(true)}
+            />
+        </AnimatePresence>
+    );
+};
+
 // ProjectCard with forwardRef for AnimatePresence compatibility
 const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -92,18 +128,12 @@ const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref)
 
                 {/* Image */}
                 <div className="relative h-56 overflow-hidden">
-                    {imageError ? (
-                        <ProjectPlaceholder title={project.title} category={project.category} />
-                    ) : (
-                        <motion.img
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                            animate={{ scale: isHovered ? 1.1 : 1 }}
-                            transition={{ duration: 0.4 }}
-                            onError={() => setImageError(true)}
-                        />
-                    )}
+                    <ImageCarousel 
+                        images={project.images || [project.image]} 
+                        isHovered={isHovered} 
+                        title={project.title} 
+                        category={project.category}
+                    />
 
                     {/* Overlay gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -223,18 +253,12 @@ const FeaturedProject = ({ project, onClick }: any) => {
                 <div className="grid md:grid-cols-2 gap-6 p-6">
                     {/* Image */}
                     <div className="relative h-64 md:h-full rounded-2xl overflow-hidden">
-                        {imageError ? (
-                            <ProjectPlaceholder title={project.title} category={project.category} />
-                        ) : (
-                            <motion.img
-                                src={project.image}
-                                alt={project.title}
-                                className="w-full h-full object-cover"
-                                animate={{ scale: isHovered ? 1.05 : 1 }}
-                                transition={{ duration: 0.4 }}
-                                onError={() => setImageError(true)}
-                            />
-                        )}
+                        <ImageCarousel 
+                            images={project.images || [project.image]} 
+                            isHovered={isHovered} 
+                            title={project.title} 
+                            category={project.category}
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     </div>
 
@@ -328,17 +352,12 @@ const ProjectModal = ({ project, onClose }: any) => {
                 </button>
 
                 {/* Image */}
-                <div className="relative h-64 md:h-80">
-                    {imageError ? (
-                        <ProjectPlaceholder title={project.title} category={project.category} />
-                    ) : (
-                        <img
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                            onError={() => setImageError(true)}
-                        />
-                    )}
+                <div className="relative h-64 md:h-80 overflow-hidden">
+                    <ImageCarousel 
+                        images={project.images || [project.image]} 
+                        title={project.title} 
+                        category={project.category}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
                 </div>
 
