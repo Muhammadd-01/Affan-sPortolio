@@ -279,7 +279,7 @@ export default function HeroSection() {
                     variants={itemVariants}
                     className="flex flex-wrap justify-center gap-6 sm:gap-12 mb-12"
                 >
-                    <StatCard value="15+" label="Projects" delay={1.5} />
+                    <StatCard value="50+" label="Projects" delay={1.5} />
                     <StatCard value="3+" label="Years Exp" delay={1.7} />
                     <StatCard value="250+" label="Contributions" delay={1.9} />
                 </motion.div>

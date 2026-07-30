@@ -399,9 +399,14 @@ const ProjectsSection = () => {
 
     const categories = ["All", "Website", "Web Application", "Mobile App"];
     const featuredProjects = projects.filter((p) => p.featured);
+    
+    // Only the first 2 featured projects are displayed in the top featured section. 
+    // Any remaining featured projects should fall back into the regular grid.
+    const topFeaturedIds = new Set(featuredProjects.slice(0, 2).map(p => p.id));
+    
     const filteredProjects = filter === "All"
-        ? projects.filter((p) => !p.featured)
-        : projects.filter((p) => p.category === filter && !p.featured);
+        ? projects.filter((p) => !topFeaturedIds.has(p.id))
+        : projects.filter((p) => p.category === filter && !topFeaturedIds.has(p.id));
 
     const handleFilterChange = (category: string) => {
         setFilter(category);

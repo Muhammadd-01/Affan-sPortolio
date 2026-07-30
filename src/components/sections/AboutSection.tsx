@@ -15,7 +15,7 @@ export default function AboutSection() {
 
     useEffect(() => {
         if (!isInView) return;
-        const targets = { projects: 15, experience: 3, contributions: 250, coffee: 1000 };
+        const targets = { projects: 50, experience: 3, contributions: 250, coffee: 1000 };
         const steps = 60;
         const duration = 2000;
         (Object.keys(targets) as Array<keyof typeof targets>).forEach((key) => {
