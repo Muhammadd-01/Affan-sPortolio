@@ -559,11 +559,19 @@ export const projects = [
         id: 25,
         title: "MindBloom",
         category: "Mobile App",
-        image: "https://picsum.photos/seed/mindbloom/800/600",
+        image: "/projects/mindbloom/coach-3d.jpg",
         images: [
-            "https://picsum.photos/seed/mindbloom/800/600",
-            "https://picsum.photos/seed/mindbloom-2/800/600",
-            "https://picsum.photos/seed/mindbloom-3/800/600"
+            "/projects/mindbloom/coach-3d.jpg",
+            "/projects/mindbloom/splash-3d.jpg",
+            "/projects/mindbloom/home-3d.jpg",
+            "/projects/mindbloom/psychology-3d.jpg",
+            "/projects/mindbloom/insights-3d.jpg",
+            "/projects/mindbloom/activity-3d.jpg",
+            "/projects/mindbloom/settings-3d.jpg",
+            "/projects/mindbloom/profile-settings-3d.jpg",
+            "/projects/mindbloom/edit-profile-3d.jpg",
+            "/projects/mindbloom/seedling-plan-3d.jpg",
+            "/projects/mindbloom/forest-plan-3d.jpg"
         ],
         description: "Behavioral AI & Positivity Companion with real-time sentiment analysis.",
         longDescription: "A cutting-edge mobile application designed to foster mental well-being, behavioral change, and emotional intelligence through the power of Advanced AI and reflective journaling.",

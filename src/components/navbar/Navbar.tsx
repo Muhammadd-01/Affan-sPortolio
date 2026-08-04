@@ -12,7 +12,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
 
 
-    const activeSection = useActiveSection(navLinks.map(link => link.href));
+    const [activeSection, setActiveSection] = useActiveSection(navLinks.map(link => link.href));
     const scrollTo = useSmoothScroll();
 
     useEffect(() => {
@@ -24,6 +24,7 @@ export default function Navbar() {
     }, []);
 
     const handleNavClick = (href: string) => {
+        setActiveSection(href);
         scrollTo(href);
         setTimeout(() => {
             setIsOpen(false);
