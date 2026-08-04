@@ -876,3 +876,12 @@ body {
   border-left: 4px solid var(--neon-blue);
   font-family: 'JetBrains Mono', monospace;
 }
+
+/* Hide Navbar when modal is open */
+body.modal-open #navbar-main,
+body.modal-open nav {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
