@@ -554,9 +554,8 @@ const ProjectsSection = () => {
     const categories = ["All", "Website", "Web Application", "Mobile App"];
     const featuredProjects = projects.filter((p) => p.featured);
     
-    // Only the first 2 featured projects are displayed in the top featured section. 
-    // Any remaining featured projects should fall back into the regular grid.
-    const topFeaturedIds = new Set(featuredProjects.slice(0, 2).map(p => p.id));
+    // Display all featured projects in the top featured section.
+    const topFeaturedIds = new Set(featuredProjects.map(p => p.id));
     
     const filteredProjects = filter === "All"
         ? projects.filter((p) => !topFeaturedIds.has(p.id))
@@ -593,7 +592,7 @@ const ProjectsSection = () => {
 
                 {/* Featured projects */}
                 <div className="grid lg:grid-cols-2 gap-6 mb-12">
-                    {featuredProjects.slice(0, 2).map((project) => (
+                    {featuredProjects.map((project) => (
                         <FeaturedProject
                             key={project.id}
                             project={project}
