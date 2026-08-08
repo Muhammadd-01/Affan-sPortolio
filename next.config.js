@@ -2,7 +2,12 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['images.unsplash.com'],
+        remotePatterns: [
+            { protocol: 'https', hostname: 'images.unsplash.com' },
+            { protocol: 'https', hostname: 'cdn.jsdelivr.net' },
+            { protocol: 'https', hostname: 'www.vectorlogo.zone' },
+            { protocol: 'https', hostname: 'picsum.photos' },
+        ],
     },
 };
 

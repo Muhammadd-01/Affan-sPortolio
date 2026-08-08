@@ -4,6 +4,7 @@ import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { Zap, TrendingUp, Code2, Globe, Layers, Wrench, Database, Smartphone } from "lucide-react";
 import TiltCard from "@/components/ui/TiltCard";
+import Image from "next/image";
 
 // Tech icon via devicon CDN — no npm package needed
 function TechIcon({ name, iconUrl, color }: { name: string; iconUrl: string; color: string }) {
@@ -18,7 +19,7 @@ function TechIcon({ name, iconUrl, color }: { name: string; iconUrl: string; col
         );
     }
     return (
-        <img src={iconUrl} alt={name} width={40} height={40}
+        <Image src={iconUrl} alt={name} width={40} height={40}
             className="object-contain"
             style={{ filter: `drop-shadow(0 0 6px ${color}80)` }}
             onError={() => setErr(true)} />

@@ -3,17 +3,20 @@
 import { useState, useRef, forwardRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { FaGithub } from "react-icons/fa";
 import { HiExternalLink, HiX } from "react-icons/hi";
-import { Star, ArrowRight, Code, Smartphone, Globe } from "lucide-react";
+import { Star, ArrowRight, Code, Smartphone, Globe, Download } from "lucide-react";
 import { projects as portfolioProjects, techColorMap } from "@/data/portfolio";
 import TiltCard from "@/components/ui/TiltCard";
+import Image from "next/image";
+
+const MotionImage = motion(Image);
 
 const projects = portfolioProjects.map(p => ({
     ...p,
     technologies: p.tech,
     live: p.liveUrl,
     github: p.githubUrl,
+    apkUrl: (p as any).apkUrl || "#",
     color: techColorMap[p.tech[0]] || "#00E5FF"
 }));
 
@@ -60,11 +63,13 @@ const ImageCarousel = ({ images, isHovered, title, category, isMobile, showDots 
     return (
         <>
             <AnimatePresence mode="wait">
-                <motion.img
+                <MotionImage
                     key={currentIndex}
                     src={currentImage}
                     alt={`${title} image ${currentIndex + 1}`}
-                    className={`absolute inset-0 w-full h-full ${isMobile ? 'object-contain' : 'object-cover'}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className={`${isMobile ? 'object-contain' : 'object-cover'}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, scale: isHovered ? 1.1 : 1 }}
                     exit={{ opacity: 0 }}
@@ -186,29 +191,30 @@ const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref)
                     </div>
 
                     {/* Links */}
-                    <div className="flex items-center gap-3">
-                        <motion.a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 hover:border-white/20 transition-all"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            <FaGithub size={18} />
-                        </motion.a>
-                        {project.live !== "#" && (
+                    <div className="flex items-center gap-3 mt-auto">
+                        {project.category === "Mobile App" ? (
                             <motion.a
-                                href={project.live}
+                                href={project.apkUrl || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/30 transition-all"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 text-cyan-300 font-medium text-xs hover:bg-cyan-500/30 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,229,255,0.1)]"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                <HiExternalLink size={18} />
+                                <Download size={15} /> Download APK (Test)
+                            </motion.a>
+                        ) : (
+                            <motion.a
+                                href={project.live !== "#" ? project.live : "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 text-cyan-300 font-medium text-xs hover:bg-cyan-500/30 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,229,255,0.1)]"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <HiExternalLink size={15} /> Live Link
                             </motion.a>
                         )}
                     </div>
@@ -279,26 +285,27 @@ const FeaturedProject = ({ project, onClick }: any) => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <motion.a
-                                href={project.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-                                whileHover={{ scale: 1.05 }}
-                            >
-                                <FaGithub size={18} /> GitHub
-                            </motion.a>
-                            {project.live !== "#" && (
+                            {project.category === "Mobile App" ? (
                                 <motion.a
-                                    href={project.live}
+                                    href={project.apkUrl || "#"}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-medium hover:opacity-90 transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-semibold hover:opacity-95 transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)]"
                                     whileHover={{ scale: 1.05 }}
                                 >
-                                    <HiExternalLink size={18} /> Live Demo
+                                    <Download size={18} /> Download APK (Test)
+                                </motion.a>
+                            ) : (
+                                <motion.a
+                                    href={project.live !== "#" ? project.live : "#"}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-semibold hover:opacity-95 transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)]"
+                                    whileHover={{ scale: 1.05 }}
+                                >
+                                    <HiExternalLink size={18} /> Live Link
                                 </motion.a>
                             )}
                         </div>
@@ -452,27 +459,15 @@ const ProjectModal = ({ project, onClose }: any) => {
 
                             <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/10">
                                 <motion.a
-                                    href={project.github}
+                                    href={project.apkUrl || "#"}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/10 text-white font-semibold text-sm hover:bg-white/20 transition-all shadow-md"
+                                    className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black font-bold text-sm hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)]"
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    <FaGithub size={18} /> View Source Code
+                                    <Download size={19} /> Download APK (Test)
                                 </motion.a>
-                                {project.live !== "#" && (
-                                    <motion.a
-                                        href={project.live}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black font-bold text-sm hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)]"
-                                        whileHover={{ scale: 1.03 }}
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        <HiExternalLink size={19} /> Live Demo / Install
-                                    </motion.a>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -515,25 +510,15 @@ const ProjectModal = ({ project, onClose }: any) => {
 
                             <div className="flex items-center gap-4">
                                 <motion.a
-                                    href={project.github}
+                                    href={project.live !== "#" ? project.live : "#"}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-                                    whileHover={{ scale: 1.05 }}
+                                    className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black font-bold text-sm hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)]"
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.98 }}
                                 >
-                                    <FaGithub size={20} /> View on GitHub
+                                    <HiExternalLink size={20} /> Live Link
                                 </motion.a>
-                                {project.live !== "#" && (
-                                    <motion.a
-                                        href={project.live}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-medium hover:opacity-90 transition-all"
-                                        whileHover={{ scale: 1.05 }}
-                                    >
-                                        <HiExternalLink size={20} /> Visit Live Site
-                                    </motion.a>
-                                )}
                             </div>
                         </div>
                     </>
