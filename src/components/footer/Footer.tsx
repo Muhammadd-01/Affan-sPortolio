@@ -255,7 +255,7 @@ export default function Footer() {
                     className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 mb-8 border-y border-glass-border"
                 >
                     {[
-                        { label: "Projects Completed", value: "15+", icon: Code },
+                        { label: "Projects Completed", value: "50+", icon: Code },
                         { label: "Code Contributions", value: "250+", icon: Sparkles },
                         { label: "Years Experience", value: "3+", icon: GraduationCap },
                         { label: "Cups of Coffee", value: "1000+", icon: Coffee },

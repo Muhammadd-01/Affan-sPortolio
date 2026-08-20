@@ -3,6 +3,8 @@
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { Zap, TrendingUp, Code2, Globe, Layers, Wrench, Database, Smartphone } from "lucide-react";
+import TiltCard from "@/components/ui/TiltCard";
+import Image from "next/image";
 
 // Tech icon via devicon CDN — no npm package needed
 function TechIcon({ name, iconUrl, color }: { name: string; iconUrl: string; color: string }) {
@@ -17,7 +19,7 @@ function TechIcon({ name, iconUrl, color }: { name: string; iconUrl: string; col
         );
     }
     return (
-        <img src={iconUrl} alt={name} width={40} height={40}
+        <Image src={iconUrl} alt={name} width={40} height={40}
             className="object-contain"
             style={{ filter: `drop-shadow(0 0 6px ${color}80)` }}
             onError={() => setErr(true)} />
@@ -132,14 +134,15 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
-            <motion.div
-                className="relative p-5 rounded-2xl glass border border-white/5 overflow-hidden"
-                animate={{
-                    borderColor: hovered ? `${skill.color}55` : "rgba(255,255,255,0.05)",
-                    boxShadow: hovered ? `0 0 30px ${skill.color}20, inset 0 0 20px ${skill.color}06` : "none",
-                }}
-                transition={{ duration: 0.25 }}
-            >
+            <TiltCard>
+                <motion.div
+                    className="relative p-5 rounded-2xl glass border border-white/5 overflow-hidden h-full"
+                    animate={{
+                        borderColor: hovered ? `${skill.color}55` : "rgba(255,255,255,0.05)",
+                        boxShadow: hovered ? `0 0 30px ${skill.color}20, inset 0 0 20px ${skill.color}06` : "none",
+                    }}
+                    transition={{ duration: 0.25 }}
+                >
                 <div className="absolute inset-0 pointer-events-none transition-opacity duration-300"
                     style={{ opacity: hovered ? 1 : 0, background: `radial-gradient(circle at 30% 30%, ${skill.color}10 0%, transparent 65%)` }} />
                 <div className="absolute top-0 right-0 w-16 h-16 opacity-10 pointer-events-none"
@@ -189,6 +192,7 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
                     {skill.level >= 90 ? "Expert" : skill.level >= 75 ? "Advanced" : skill.level >= 60 ? "Proficient" : "Learning"}
                 </motion.p>
             </motion.div>
+            </TiltCard>
         </motion.div>
     );
 }
@@ -245,21 +249,21 @@ export default function SkillsSection() {
                         const Icon = cat.icon;
                         return (
                             <motion.button key={cat.category} onClick={() => setActiveIdx(i)}
-                                className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium overflow-hidden"
+                                className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium overflow-hidden transition-all duration-300"
                                 style={{
                                     background: isActive ? `${cat.color}20` : "rgba(255,255,255,0.03)",
                                     border: `1px solid ${isActive ? cat.color : "rgba(255,255,255,0.08)"}`,
-                                    color: isActive ? cat.color : "rgba(237,237,237,0.55)",
+                                    color: isActive ? cat.color : "#ffffff",
                                     boxShadow: isActive ? `0 0 20px ${cat.color}28` : "none",
                                 }}
                                 whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
                                 {isActive && (
-                                    <motion.div layoutId="skillTab" className="absolute inset-0 rounded-xl opacity-15"
-                                        style={{ background: cat.color }}
+                                    <motion.div layoutId="skillTab" className="absolute inset-0 rounded-xl pointer-events-none"
+                                        style={{ background: cat.color, opacity: 0.15, zIndex: 0 }}
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
                                 )}
-                                <Icon size={14} style={{ position: "relative", zIndex: 10 }} />
-                                <span style={{ position: "relative", zIndex: 10 }}>{cat.category}</span>
+                                <Icon size={14} className="relative z-10" />
+                                <span className="relative z-10">{cat.category}</span>
                             </motion.button>
                         );
                     })}

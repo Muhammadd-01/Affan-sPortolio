@@ -18,6 +18,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import { SiDiscord, SiX } from "react-icons/si";
+import TiltCard from "@/components/ui/TiltCard";
 
 export default function ContactSection() {
     const ref = useRef(null);
@@ -144,15 +145,15 @@ export default function ContactSection() {
                                 { icon: Phone, label: "Phone", value: personalInfo.phone, href: `tel:${personalInfo.phone}` },
                                 { icon: MapPin, label: "Location", value: personalInfo.location, href: personalInfo.locationLink },
                             ].map((item, index) => (
+                                <TiltCard key={item.label}>
                                 <motion.a
-                                    key={item.label}
                                     href={item.href || undefined}
                                     target={item.href ? "_blank" : undefined}
                                     rel={item.href ? "noopener noreferrer" : undefined}
                                     initial={{ opacity: 0, x: -30 }}
                                     animate={isInView ? { opacity: 1, x: 0 } : {}}
                                     transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
-                                    className="flex items-center gap-4 p-4 glass rounded-xl group hover:bg-glass-white transition-all"
+                                    className="flex items-center gap-4 p-4 glass rounded-xl group hover:bg-glass-white transition-all h-full"
                                     whileHover={{ x: 10, scale: 1.02 }}
                                 >
                                     <motion.div
@@ -176,6 +177,7 @@ export default function ContactSection() {
                                         </motion.div>
                                     )}
                                 </motion.a>
+                                </TiltCard>
                             ))}
                         </div>
 

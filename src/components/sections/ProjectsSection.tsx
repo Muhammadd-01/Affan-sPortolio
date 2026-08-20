@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useRef, forwardRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { FaGithub } from "react-icons/fa";
 import { HiExternalLink, HiX } from "react-icons/hi";
-import { Star, ArrowRight, Code, Smartphone, Globe } from "lucide-react";
+import { Star, ArrowRight, Code, Smartphone, Globe, Download } from "lucide-react";
 import { projects as portfolioProjects, techColorMap } from "@/data/portfolio";
+import TiltCard from "@/components/ui/TiltCard";
+import Image from "next/image";
+
+const MotionImage = motion(Image);
 
 const projects = portfolioProjects.map(p => ({
     ...p,
     technologies: p.tech,
     live: p.liveUrl,
     github: p.githubUrl,
+    apkUrl: (p as any).apkUrl || "#",
     color: techColorMap[p.tech[0]] || "#00E5FF"
 }));
 
@@ -36,51 +41,82 @@ const ProjectPlaceholder = ({ title, category }: { title: string; category: stri
     );
 };
 
-// ProjectCard with forwardRef for AnimatePresence compatibility
+// ImageCarousel component
+const ImageCarousel = ({ images, isHovered, title, category, isMobile, showDots }: { images: string[], isHovered?: boolean, title: string, category: string, isMobile?: boolean, showDots?: boolean }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [imageError, setImageError] = useState(false);
+
+    useEffect(() => {
+        if (!images || images.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % images.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [images]);
+
+    const currentImage = images && images.length > 0 ? images[currentIndex] : "";
+
+    if (imageError || !currentImage) {
+        return <ProjectPlaceholder title={title} category={category} />;
+    }
+
+    return (
+        <>
+            <AnimatePresence mode="wait">
+                <MotionImage
+                    key={currentIndex}
+                    src={currentImage}
+                    alt={`${title} image ${currentIndex + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className={`${isMobile ? 'object-contain' : 'object-cover'}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, scale: isHovered ? 1.1 : 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    onError={() => setImageError(true)}
+                />
+            </AnimatePresence>
+            {showDots && images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    {images.map((_: string, i: number) => (
+                        <button
+                            key={i}
+                            onClick={(e) => { e.stopPropagation(); setCurrentIndex(i); }}
+                            className={`h-2 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-cyan-400 w-5' : 'bg-white/40 hover:bg-white/60 w-2'}`}
+                        />
+                    ))}
+                </div>
+            )}
+        </>
+    );
+};
+
 const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [imageError, setImageError] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const el = cardRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        setMousePosition({
-            x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
-            y: ((e.clientY - rect.top) / rect.height - 0.5) * 20,
-        });
-    };
 
     return (
         <motion.div
-            ref={ref || cardRef}
+            ref={ref}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
             onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => {
-                setIsHovered(false);
-                setMousePosition({ x: 0, y: 0 });
-            }}
-            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={() => onClick(project)}
-            className="relative group cursor-pointer"
-            style={{ perspective: "1000px" }}
+            className="h-full"
             layout
             {...props}
         >
+            <TiltCard className="h-full">
             <motion.div
-                className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10"
+                className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 group cursor-pointer"
                 animate={{
-                    rotateX: -mousePosition.y * 0.5,
-                    rotateY: mousePosition.x * 0.5,
                     scale: isHovered ? 1.02 : 1,
                 }}
                 transition={{ duration: 0.1 }}
-                style={{ transformStyle: "preserve-3d" }}
             >
                 {/* Featured badge */}
                 {project.featured && (
@@ -92,18 +128,12 @@ const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref)
 
                 {/* Image */}
                 <div className="relative h-56 overflow-hidden">
-                    {imageError ? (
-                        <ProjectPlaceholder title={project.title} category={project.category} />
-                    ) : (
-                        <motion.img
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                            animate={{ scale: isHovered ? 1.1 : 1 }}
-                            transition={{ duration: 0.4 }}
-                            onError={() => setImageError(true)}
-                        />
-                    )}
+                    <ImageCarousel 
+                        images={project.images || [project.image]} 
+                        isHovered={isHovered} 
+                        title={project.title} 
+                        category={project.category}
+                    />
 
                     {/* Overlay gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -161,42 +191,37 @@ const ProjectCard = forwardRef(({ project, index, onClick, ...props }: any, ref)
                     </div>
 
                     {/* Links */}
-                    <div className="flex items-center gap-3">
-                        <motion.a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 hover:border-white/20 transition-all"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            <FaGithub size={18} />
-                        </motion.a>
-                        {project.live !== "#" && (
+                    <div className="flex items-center gap-3 mt-auto">
+                        {project.category === "Mobile App" ? (
                             <motion.a
-                                href={project.live}
+                                href={project.apkUrl || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/30 transition-all"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 text-cyan-300 font-medium text-xs hover:bg-cyan-500/30 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,229,255,0.1)]"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                <HiExternalLink size={18} />
+                                <Download size={15} /> Download APK (Test)
+                            </motion.a>
+                        ) : (
+                            <motion.a
+                                href={project.live !== "#" ? project.live : "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 text-cyan-300 font-medium text-xs hover:bg-cyan-500/30 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,229,255,0.1)]"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <HiExternalLink size={15} /> Live Link
                             </motion.a>
                         )}
                     </div>
                 </div>
 
-                {/* 3D effect border glow */}
-                <motion.div
-                    className="absolute inset-0 rounded-3xl pointer-events-none"
-                    style={{
-                        background: `radial-gradient(circle at ${50 + mousePosition.x}% ${50 + mousePosition.y}%, rgba(0, 255, 255, 0.15), transparent 50%)`,
-                    }}
-                />
             </motion.div>
+            </TiltCard>
         </motion.div>
     );
 });
@@ -217,24 +242,19 @@ const FeaturedProject = ({ project, onClick }: any) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => onClick(project)}
-            className="lg:col-span-1 relative group cursor-pointer"
+            className="lg:col-span-1 relative group cursor-pointer h-full"
         >
-            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-pink-500/10 border border-cyan-500/20">
+            <TiltCard className="h-full">
+            <div className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-pink-500/10 border border-cyan-500/20">
                 <div className="grid md:grid-cols-2 gap-6 p-6">
                     {/* Image */}
                     <div className="relative h-64 md:h-full rounded-2xl overflow-hidden">
-                        {imageError ? (
-                            <ProjectPlaceholder title={project.title} category={project.category} />
-                        ) : (
-                            <motion.img
-                                src={project.image}
-                                alt={project.title}
-                                className="w-full h-full object-cover"
-                                animate={{ scale: isHovered ? 1.05 : 1 }}
-                                transition={{ duration: 0.4 }}
-                                onError={() => setImageError(true)}
-                            />
-                        )}
+                        <ImageCarousel 
+                            images={project.images || [project.image]} 
+                            isHovered={isHovered} 
+                            title={project.title} 
+                            category={project.category}
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     </div>
 
@@ -265,32 +285,34 @@ const FeaturedProject = ({ project, onClick }: any) => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <motion.a
-                                href={project.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-                                whileHover={{ scale: 1.05 }}
-                            >
-                                <FaGithub size={18} /> GitHub
-                            </motion.a>
-                            {project.live !== "#" && (
+                            {project.category === "Mobile App" ? (
                                 <motion.a
-                                    href={project.live}
+                                    href={project.apkUrl || "#"}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-medium hover:opacity-90 transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-semibold hover:opacity-95 transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)]"
                                     whileHover={{ scale: 1.05 }}
                                 >
-                                    <HiExternalLink size={18} /> Live Demo
+                                    <Download size={18} /> Download APK (Test)
+                                </motion.a>
+                            ) : (
+                                <motion.a
+                                    href={project.live !== "#" ? project.live : "#"}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-semibold hover:opacity-95 transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)]"
+                                    whileHover={{ scale: 1.05 }}
+                                >
+                                    <HiExternalLink size={18} /> Live Link
                                 </motion.a>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
+            </TiltCard>
         </motion.div>
     );
 };
@@ -298,99 +320,212 @@ const FeaturedProject = ({ project, onClick }: any) => {
 // Project Detail Modal
 const ProjectModal = ({ project, onClose }: any) => {
     const [imageError, setImageError] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         document.body.style.overflow = "hidden";
-        return () => { document.body.style.overflow = ""; };
+        document.body.classList.add("modal-open");
+        return () => { 
+            document.body.style.overflow = ""; 
+            document.body.classList.remove("modal-open");
+        };
     }, []);
 
-    return (
+    if (!mounted) return null;
+
+    return createPortal(
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85"
+            className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
         >
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-white/10"
+                className={`relative w-full ${project.category === "Mobile App" ? "max-w-6xl" : "max-w-4xl"} ${project.category === "Mobile App" ? "h-[90vh] overflow-hidden" : "max-h-[90vh] overflow-y-auto"} rounded-3xl bg-gradient-to-br from-gray-900 via-black to-gray-950 border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.9)]`}
             >
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                    className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg backdrop-blur-md"
                 >
                     <HiX size={24} />
                 </button>
 
-                {/* Image */}
-                <div className="relative h-64 md:h-80">
-                    {imageError ? (
-                        <ProjectPlaceholder title={project.title} category={project.category} />
-                    ) : (
-                        <img
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                            onError={() => setImageError(true)}
-                        />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
-                </div>
+                {project.category === "Mobile App" ? (
+                    /* ── Mobile App: Expanded side-by-side showcase layout ── */
+                    <div className="grid lg:grid-cols-[440px_1fr] md:grid-cols-[380px_1fr] gap-0 h-full">
+                        {/* Image column – sticky, fills full modal height, never scrolls */}
+                        <div className="relative h-full overflow-hidden border-r border-white/5 flex-shrink-0">
+                            <ImageCarousel
+                                images={project.images || [project.image]}
+                                title={project.title}
+                                category={project.category}
+                                isMobile={false}
+                                showDots={true}
+                            />
+                        </div>
 
-                {/* Content */}
-                <div className="p-8">
-                    <span className="text-cyan-400 text-sm uppercase tracking-wider font-medium">
-                        {project.category}
-                    </span>
+                        {/* Details column – independently scrollable */}
+                        <div className="p-6 md:p-10 flex flex-col justify-between bg-black/40 overflow-y-auto h-full">
+                            <div>
+                                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                    <span className="text-cyan-400 text-xs md:text-sm uppercase tracking-widest font-bold flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                                        <Smartphone className="w-4 h-4 text-cyan-400" /> {project.category}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 text-gray-300 border border-white/10">
+                                            📱 iOS & Android
+                                        </span>
+                                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                            ⚡ 60 FPS Native
+                                        </span>
+                                    </div>
+                                </div>
 
-                    <h2 className="text-3xl font-bold text-white mt-2 mb-4">{project.title}</h2>
+                                <h2 className="text-3xl lg:text-4xl font-extrabold text-white mt-2 mb-4 tracking-tight">{project.title}</h2>
 
-                    <p className="text-gray-300 mb-6">{project.longDescription || project.description}</p>
+                                <p className="text-gray-300 text-base md:text-lg mb-6 leading-relaxed bg-white/[0.02] p-4.5 rounded-2xl border border-white/5 shadow-inner">
+                                    {project.longDescription || project.description}
+                                </p>
 
-                    <div className="mb-6">
-                        <h4 className="text-lg font-semibold text-white mb-3">Technologies Used</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {project.technologies.map((tech: string) => (
-                                <span
-                                    key={tech}
-                                    className="px-4 py-2 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                                {/* App Architecture & Highlights Grid */}
+                                <div className="grid grid-cols-2 gap-3 mb-6">
+                                    <div className="p-3.5 rounded-2xl bg-gradient-to-br from-cyan-500/10 via-white/[0.02] to-transparent border border-cyan-500/20">
+                                        <div className="text-cyan-400 font-semibold text-xs mb-1 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" /> Architecture
+                                        </div>
+                                        <div className="text-white font-medium text-sm">{(project as any).architecture || "Clean Architecture + MVVM"}</div>
+                                    </div>
+                                    <div className="p-3.5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-white/[0.02] to-transparent border border-purple-500/20">
+                                        <div className="text-purple-400 font-semibold text-xs mb-1 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-purple-400" /> State Management
+                                        </div>
+                                        <div className="text-white font-medium text-sm">{project.technologies.includes("Riverpod") ? "Riverpod Reactive State" : project.technologies.includes("Freezed") ? "Riverpod + Freezed" : "Reactive State Management"}</div>
+                                    </div>
+                                    <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-white/[0.02] to-transparent border border-emerald-500/20">
+                                        <div className="text-emerald-400 font-semibold text-xs mb-1 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Backend & Cloud
+                                        </div>
+                                        <div className="text-white font-medium text-sm">{project.technologies.includes("Firebase") ? "Firebase Realtime Sync" : "REST & Cloud API"}</div>
+                                    </div>
+                                    <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-white/[0.02] to-transparent border border-amber-500/20">
+                                        <div className="text-amber-400 font-semibold text-xs mb-1 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-amber-400" /> User Experience
+                                        </div>
+                                        <div className="text-white font-medium text-sm">Offline-First & Haptic UI</div>
+                                    </div>
+                                </div>
+
+                                {/* Key Features Section */}
+                                <div className="mb-6">
+                                    <h4 className="text-md font-bold text-white mb-3 flex items-center gap-2 tracking-wide uppercase text-sm">
+                                        <span className="text-cyan-400">✨</span> Core Capabilities & Features
+                                    </h4>
+                                    <ul className="grid grid-cols-1 gap-2.5">
+                                        {((project as any).features || [
+                                            "Cross-platform responsive layout optimized for mobile and tablet displays",
+                                            "Offline-first local database synchronization with real-time cloud backup",
+                                            "Smooth fluid transitions, custom micro-animations, and haptic feedback",
+                                            "Secure multi-layered user authentication and role-based access control"
+                                        ]).map((feature: string, idx: number) => (
+                                            <li key={idx} className="flex items-start gap-3 text-sm text-gray-300 bg-white/[0.02] hover:bg-white/[0.05] p-3 rounded-xl border border-white/5 transition-all">
+                                                <span className="text-cyan-400 font-bold mt-0.5">•</span>
+                                                <span className="leading-snug">{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="mb-8">
+                                    <h4 className="text-md font-bold text-white mb-3 text-sm tracking-wide uppercase">Technologies & Frameworks</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.technologies.map((tech: string) => (
+                                            <span
+                                                key={tech}
+                                                className="px-4 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-[0_0_15px_rgba(0,229,255,0.05)]"
+                                            >
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/10">
+                                <motion.a
+                                    href={project.apkUrl || "#"}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black font-bold text-sm hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)]"
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.98 }}
                                 >
-                                    {tech}
-                                </span>
-                            ))}
+                                    <Download size={19} /> Download APK (Test)
+                                </motion.a>
+                            </div>
                         </div>
                     </div>
+                ) : (
+                    /* ── Website / Web App: original stacked layout ── */
+                    <>
+                        {/* Image */}
+                        <div className="relative h-64 md:h-80 overflow-hidden">
+                            <ImageCarousel
+                                images={project.images || [project.image]}
+                                title={project.title}
+                                category={project.category}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+                        </div>
 
-                    <div className="flex items-center gap-4">
-                        <motion.a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <FaGithub size={20} /> View on GitHub
-                        </motion.a>
-                        {project.live !== "#" && (
-                            <motion.a
-                                href={project.live}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-black font-medium hover:opacity-90 transition-all"
-                                whileHover={{ scale: 1.05 }}
-                            >
-                                <HiExternalLink size={20} /> Visit Live Site
-                            </motion.a>
-                        )}
-                    </div>
-                </div>
+                        {/* Content */}
+                        <div className="p-8">
+                            <span className="text-cyan-400 text-sm uppercase tracking-wider font-medium">
+                                {project.category}
+                            </span>
+
+                            <h2 className="text-3xl font-bold text-white mt-2 mb-4">{project.title}</h2>
+
+                            <p className="text-gray-300 mb-6">{project.longDescription || project.description}</p>
+
+                            <div className="mb-6">
+                                <h4 className="text-lg font-semibold text-white mb-3">Technologies Used</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {project.technologies.map((tech: string) => (
+                                        <span
+                                            key={tech}
+                                            className="px-4 py-2 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                                        >
+                                            {tech}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <motion.a
+                                    href={project.live !== "#" ? project.live : "#"}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black font-bold text-sm hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)]"
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <HiExternalLink size={20} /> Live Link
+                                </motion.a>
+                            </div>
+                        </div>
+                    </>
+                )}
             </motion.div>
-        </motion.div>
+        </motion.div>,
+        document.body
     );
 };
 
@@ -403,9 +538,13 @@ const ProjectsSection = () => {
 
     const categories = ["All", "Website", "Web Application", "Mobile App"];
     const featuredProjects = projects.filter((p) => p.featured);
+    
+    // Display all featured projects in the top featured section.
+    const topFeaturedIds = new Set(featuredProjects.map(p => p.id));
+    
     const filteredProjects = filter === "All"
-        ? projects.filter((p) => !p.featured)
-        : projects.filter((p) => p.category === filter && !p.featured);
+        ? projects.filter((p) => !topFeaturedIds.has(p.id))
+        : projects.filter((p) => p.category === filter && !topFeaturedIds.has(p.id));
 
     const handleFilterChange = (category: string) => {
         setFilter(category);
@@ -438,7 +577,7 @@ const ProjectsSection = () => {
 
                 {/* Featured projects */}
                 <div className="grid lg:grid-cols-2 gap-6 mb-12">
-                    {featuredProjects.slice(0, 2).map((project) => (
+                    {featuredProjects.map((project) => (
                         <FeaturedProject
                             key={project.id}
                             project={project}

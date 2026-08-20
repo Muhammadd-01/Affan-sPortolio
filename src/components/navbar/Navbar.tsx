@@ -12,7 +12,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
 
 
-    const activeSection = useActiveSection(navLinks.map(link => link.href));
+    const [activeSection, setActiveSection] = useActiveSection(navLinks.map(link => link.href));
     const scrollTo = useSmoothScroll();
 
     useEffect(() => {
@@ -24,6 +24,7 @@ export default function Navbar() {
     }, []);
 
     const handleNavClick = (href: string) => {
+        setActiveSection(href);
         scrollTo(href);
         setTimeout(() => {
             setIsOpen(false);
@@ -33,6 +34,7 @@ export default function Navbar() {
 
     return (
         <motion.nav
+            id="navbar-main"
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
